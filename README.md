@@ -8,7 +8,7 @@ This Web App for building skills and training
 
 Built with ASP.NET Core, CQRS (MediatR), and Onion Architecture
 
-[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![C#](https://img.shields.io/badge/C%23-239120?logo=csharp&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/csharp/)
 [![Entity Framework Core](https://img.shields.io/badge/EF%20Core-Data%20Access-blueviolet)](https://learn.microsoft.com/en-us/ef/core/)
 [![MediatR](https://img.shields.io/badge/MediatR-CQRS-orange)](https://github.com/jbogard/MediatR)
