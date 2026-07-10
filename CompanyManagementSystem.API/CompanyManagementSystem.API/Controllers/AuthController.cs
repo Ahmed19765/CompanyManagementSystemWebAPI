@@ -5,6 +5,9 @@ using CompanyManagementSystem.Application.Features.Commands.RequestPasswordReset
 using CompanyManagementSystem.Application.Features.Commands.ResetPassword;
 using CompanyManagementSystem.Application.Features.Commands.RefreshToken;
 using CompanyManagementSystem.Application.Features.Commands.VerifyEmail;
+using CompanyManagementSystem.Application.Features.Commands.DeleteUserAccount;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -118,6 +121,52 @@ namespace CompanyManagementSystem.API.Controllers
             {
                 return BadRequest(new { Message = ex.Message });
             }
+        }
+
+        [Authorize]
+        [HttpPost("request-delete-account")]
+        public async Task<IActionResult> RequestDeleteAccount()
+        {
+            try
+            {
+                var command = new RequestDeleteAccountCommand
+                {
+                    UserId = GetCurrentUserId()
+                };
+                var response = await _mediator.Send(command);
+                return Ok(response);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpDelete("delete-account")]
+        public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountCommand command)
+        {
+            try
+            {
+                command.UserId = GetCurrentUserId();
+                var response = await _mediator.Send(command);
+                return Ok(response);
+            }
+            catch (System.Exception ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
+        private Guid GetCurrentUserId()
+        {
+            var value = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                        ?? User.FindFirstValue("sub");
+
+            if (!Guid.TryParse(value, out var id))
+                throw new Exception("Invalid token.");
+
+            return id;
         }
     }
 }

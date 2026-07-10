@@ -37,7 +37,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateTeam
                 throw new Exception("This account is banned!");
             }
 
-            if (!owner.IsEmailVerfied)
+            if (!owner.EmailConfirmed)
             {
                 throw new Exception("Please verfiey your email!");
             }
@@ -53,7 +53,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateTeam
                 throw new Exception("Department not found.");
             }
 
-            if (department.Company?.OwnerId != owner.UserId)
+            if (department.Company?.OwnerId != owner.Id)
             {
                 throw new Exception("You can only create teams for departments in your own company.");
             }
@@ -82,8 +82,8 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateTeam
             }
 
             var leaderMembership = await _companyUserRepository.GetMembershipAsync(
-                department.CompanyId,
-                leader.UserId);
+                department.CompanyId ?? 0,
+                leader.Id);
 
             if (leaderMembership is null)
             {

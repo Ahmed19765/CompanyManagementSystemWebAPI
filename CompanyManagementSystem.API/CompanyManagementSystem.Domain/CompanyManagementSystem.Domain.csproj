@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!--
+      Microsoft.AspNetCore.Identity is part of the ASP.NET Core shared framework on .NET 10.
+      We reference the EF Core Identity package here so the Domain assembly can resolve
+      IdentityUser<TKey> without pulling in the full infrastructure stack.
+    -->
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.9" />
+  </ItemGroup>
+
 </Project>

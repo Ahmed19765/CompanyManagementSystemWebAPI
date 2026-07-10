@@ -36,7 +36,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.ResendEmailVerif
                 throw new Exception("User not found.");
             }
 
-            if (user.IsEmailVerfied)
+            if (user.EmailConfirmed)
             {
                 return new ResendEmailVerificationOtpResponse
                 {

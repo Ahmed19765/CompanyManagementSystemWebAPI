@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Commands\Register\" />
-    <Folder Include="Features\Queries\" />
   </ItemGroup>
 
   <ItemGroup>

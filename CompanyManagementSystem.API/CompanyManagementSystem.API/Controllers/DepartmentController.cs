@@ -1,4 +1,7 @@
 using CompanyManagementSystem.Application.Features.Commands.CreateDepartment;
+using CompanyManagementSystem.Application.Features.Commands.DeleteDepartment;
+using CompanyManagementSystem.Application.Features.Commands.UpdateDepartment;
+using CompanyManagementSystem.Application.Features.Queries.GetDepartmentTeams;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,29 +20,78 @@ namespace CompanyManagementSystem.API.Controllers
             _mediator = mediator;
         }
 
+        // ── Commands ───────────────────────────────────────────────────────────────
+
         [Authorize(Roles = "Owner")]
         [HttpPost]
         public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentCommand command)
         {
             try
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)
-                    ?? User.FindFirstValue("sub");
-
-                if (!Guid.TryParse(userId, out var ownerId))
-                {
-                    return Unauthorized(new { Message = "Invalid token." });
-                }
-
-                command.OwnerId = ownerId;
-
-                var response = await _mediator.Send(command);
-                return Ok(response);
+                command.OwnerId = GetCurrentUserId();
+                return Ok(await _mediator.Send(command));
             }
-            catch (System.Exception ex)
-            {
-                return BadRequest(new { Message = ex.Message });
-            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
         }
+
+        [Authorize(Roles = "Owner")]
+        [HttpPut("{departmentId}")]
+        public async Task<IActionResult> UpdateDepartment(int departmentId, [FromBody] UpdateDepartmentCommand command)
+        {
+            try
+            {
+                command.OwnerId = GetCurrentUserId();
+                command.DepartmentId = departmentId;
+                return Ok(await _mediator.Send(command));
+            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+        }
+
+        /// <summary>Owner: delete a department — teams are unlinked (DepartmentId = null) not deleted.</summary>
+        [Authorize(Roles = "Owner")]
+        [HttpDelete("owner/delete-department")]
+        public async Task<IActionResult> DeleteDepartment([FromBody] DeleteDepartmentCommand command)
+        {
+            try
+            {
+                command.OwnerId = GetCurrentUserId();
+                return Ok(await _mediator.Send(command));
+            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+        }
+
+        // ── Queries ────────────────────────────────────────────────────────────────
+
+        /// <summary>Owner: get all teams inside a department they own.</summary>
+        [Authorize(Roles = "Owner")]
+        [HttpGet("{departmentId}/teams")]
+        public async Task<IActionResult> GetDepartmentTeams(int departmentId)
+        {
+            try
+            {
+                var query = new GetDepartmentTeamsQuery
+                {
+                    RequestingUserId = GetCurrentUserId(),
+                    DepartmentId     = departmentId
+                };
+                return Ok(await _mediator.Send(query));
+            }
+            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+        }
+
+        // ── Helpers ────────────────────────────────────────────────────────────────
+
+        private Guid GetCurrentUserId()
+        {
+            var value = User.FindFirstValue(ClaimTypes.NameIdentifier)
+                        ?? User.FindFirstValue("sub");
+
+            if (!Guid.TryParse(value, out var id))
+                throw new Exception("Invalid token.");
+
+            return id;
+        }
+
+        
     }
 }

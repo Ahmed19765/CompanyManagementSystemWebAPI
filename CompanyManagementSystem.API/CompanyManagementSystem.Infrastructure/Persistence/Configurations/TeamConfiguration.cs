@@ -25,15 +25,19 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
                    .WithOne(ut => ut.Team)
                    .HasForeignKey(ut => ut.TeamId);
 
-            // Team Leader
+            // Team Leader — ClientSetNull: if leader user is deleted, LeaderId becomes null.
+            // Avoids cascade path: AspNetUsers → LeadingTeams (Team) → UserTeams conflict.
             builder.HasOne(t => t.Leader)
                    .WithMany(u => u.LeadingTeams)
-                   .HasForeignKey(t => t.LeaderId);
+                   .HasForeignKey(t => t.LeaderId)
+                   .OnDelete(DeleteBehavior.ClientSetNull);
 
-            // Department
+            // Department — ClientSetNull: if department is deleted, DepartmentId becomes null.
+            // The team survives and can be reassigned to another department later.
             builder.HasOne(t => t.Department)
                    .WithMany(d => d.Teams)
-                   .HasForeignKey(t => t.DepartmentId);
+                   .HasForeignKey(t => t.DepartmentId)
+                   .OnDelete(DeleteBehavior.ClientSetNull);
         }
 
     }

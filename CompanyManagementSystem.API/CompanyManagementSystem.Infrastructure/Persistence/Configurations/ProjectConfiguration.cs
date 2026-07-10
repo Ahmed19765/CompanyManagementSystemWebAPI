@@ -27,24 +27,29 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
                    .HasColumnType("decimal(18,2)")
                    .IsRequired();
 
+            builder.Property(p => p.ProjectStatus)
+                   .HasConversion<string>()
+                   .IsRequired();
+
             builder.Property(p => p.UploadedDate);
 
             // Customer (User)
             builder.HasOne(p => p.Customer)
                    .WithMany(u => u.OwnedProjects)
                    .HasForeignKey(p => p.CustomerId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.SetNull);
 
             // Assigned Teams (Many-to-Many)
             builder.HasMany(p => p.AssignedTeams)
                    .WithOne(pt => pt.Project)
                    .HasForeignKey(pt => pt.ProjectId);
 
-            // Company Offers
+            // Company Offers — ClientCascade: ProjectId is part of composite PK, can't be nulled.
+            // Deleting a project removes its offers via EF in memory.
             builder.HasMany(p => p.CompanyOffers)
                    .WithOne(co => co.Project)
                    .HasForeignKey(co => co.ProjectId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

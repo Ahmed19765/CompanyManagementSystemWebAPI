@@ -1,3 +1,5 @@
+using CompanyManagementSystem.Domain.Enumerations;
+
 namespace CompanyManagementSystem.Domain.Entities
 {
     public class Project
@@ -7,10 +9,12 @@ namespace CompanyManagementSystem.Domain.Entities
         public string? ProjectDescription { get; set; }
         public string? ProjectDocumentsUrl { get; set; }
         public decimal ProjectOfferedBudget { get; set; }
+        public ProjectState? ProjectStatus { get; set; } = ProjectState.Pending;
         public DateTime? UploadedDate { get; set; } = DateTime.UtcNow;
 
 
-        public Guid CustomerId { get; set; }
+        // Nullable — project survives if the customer user account is deleted
+        public Guid? CustomerId { get; set; }
         public User? Customer { get; set; }
 
         // Teams assigned to work on this project (Many-to-Many)

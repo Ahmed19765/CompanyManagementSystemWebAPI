@@ -24,11 +24,17 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
                    .HasMaxLength(36)
                    .IsRequired();
 
+            builder.Property(c => c.IsDeleted)
+                   .IsRequired()
+                   .HasDefaultValue(false);
+
+            builder.Property(c => c.DeletedAt);
+
             //Company Owners (1-to-Many)
             builder.HasOne(c => c.Owner)
                    .WithMany(u => u.OwnedCompanies)
                    .HasForeignKey(c => c.OwnerId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
 
             // Departments (1-to-Many)
             builder.HasMany(c => c.Departments)

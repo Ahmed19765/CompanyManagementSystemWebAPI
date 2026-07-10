@@ -25,6 +25,9 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
                    .HasMaxLength(30)
                    .IsRequired();
 
+            builder.Property(t => t.AssignedById)
+                   .IsRequired(false);
+
             builder.Property(t => t.CreatedAt)
                    .IsRequired();
 
@@ -34,25 +37,26 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
             builder.HasOne(t => t.Project)
                    .WithMany(p => p.Tasks)
                    .HasForeignKey(t => t.ProjectId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
 
             // Team relationship
             builder.HasOne(t => t.Team)
                    .WithMany(tm => tm.Tasks)
                    .HasForeignKey(t => t.TeamId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.SetNull);
 
-            // AssignedBy (User)
+            // AssignedBy (User) — ClientSetNull avoids multiple cascade path conflict.
+            // When user is deleted, AssignedById becomes null (task record is kept).
             builder.HasOne(t => t.AssignedBy)
                    .WithMany(u => u.AssignedByMe)
                    .HasForeignKey(t => t.AssignedById)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.ClientSetNull);
 
             // AssignedTo (User)
             builder.HasOne(t => t.AssignedTo)
                    .WithMany(u => u.AssignedToMe)
                    .HasForeignKey(t => t.AssignedToId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.ClientSetNull);
 
             // TaskDetails (One-to-One)
             builder.HasOne(t => t.Details)

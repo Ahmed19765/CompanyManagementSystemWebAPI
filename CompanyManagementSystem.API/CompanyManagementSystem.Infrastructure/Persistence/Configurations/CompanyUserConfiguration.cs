@@ -18,15 +18,20 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
             builder.Property(cu => cu.JoinedAt)
                    .IsRequired();
 
+            // Delete Company → delete its CompanyUser rows (single cascade path ✅)
             builder.HasOne(cu => cu.Company)
                    .WithMany(c => c.CompanyUsers)
                    .HasForeignKey(cu => cu.CompanyId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
 
+            // Delete User → EF handles nulling/removing CompanyUser rows in memory
+            // Avoids multiple cascade path conflict:
+            //   AspNetUsers → Companies (cascade) → CompanyUsers
+            //   AspNetUsers →                       CompanyUsers  ← second path, SQL Server rejects
             builder.HasOne(cu => cu.User)
                    .WithMany(u => u.CompanyMemberships)
                    .HasForeignKey(cu => cu.UserId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

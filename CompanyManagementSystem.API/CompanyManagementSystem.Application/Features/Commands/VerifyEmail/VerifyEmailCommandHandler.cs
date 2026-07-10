@@ -25,7 +25,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.VerifyEmail
                 throw new Exception("User not found.");
             }
 
-            if (user.IsEmailVerfied)
+            if (user.EmailConfirmed)
             {
                 return new VerifyEmailResponse
                 {
@@ -43,9 +43,10 @@ namespace CompanyManagementSystem.Application.Features.Commands.VerifyEmail
                 throw new Exception("Invalid or expired OTP.");
             }
 
-            user.IsEmailVerfied = true;
+            user.EmailConfirmed = true;
+            // UpdateAsync now goes through UserManager.UpdateAsync — it saves internally.
             await _userRepository.UpdateAsync(user);
-            await _userRepository.SaveChangesAsync();
+            // await _userRepository.SaveChangesAsync(); // not needed — UserManager saves on its own
 
             _memoryCache.Remove(request.Email, TypeOfValue.EmailVerificationOtp);
 

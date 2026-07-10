@@ -34,7 +34,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.SetCompanyUserRa
                 throw new Exception("This account is banned!");
             }
 
-            if (!owner.IsEmailVerfied)
+            if (!owner.EmailConfirmed)
             {
                 throw new Exception("Please verfiey your email!");
             }
@@ -50,12 +50,12 @@ namespace CompanyManagementSystem.Application.Features.Commands.SetCompanyUserRa
                 throw new Exception("Company not found.");
             }
 
-            if (company.OwnerId != owner.UserId)
+            if (company.OwnerId != owner.Id)
             {
                 throw new Exception("You can only update ranks for your own company.");
             }
 
-            if (request.UserId == owner.UserId)
+            if (request.UserId == owner.Id)
             {
                 throw new Exception("The company owner manages the company through Owner role, not member rank.");
             }

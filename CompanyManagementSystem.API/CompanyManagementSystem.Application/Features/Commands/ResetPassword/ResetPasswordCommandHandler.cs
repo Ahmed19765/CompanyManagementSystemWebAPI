@@ -8,18 +8,20 @@ namespace CompanyManagementSystem.Application.Features.Commands.ResetPassword
     public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, ResetPasswordResponse>
     {
         private readonly IUserRepository _userRepository;
-        private readonly IPasswordHasher _passwordHasher;
+        // IPasswordHasher no longer used here — UpdatePasswordAsync goes through UserManager.
+        // Kept as comment so you know why it was removed.
+        // private readonly IPasswordHasher _passwordHasher;
         private readonly IMemoryCache<string> _memoryCache;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
 
         public ResetPasswordCommandHandler(
             IUserRepository userRepository,
-            IPasswordHasher passwordHasher,
+            // IPasswordHasher passwordHasher,
             IMemoryCache<string> memoryCache,
             IRefreshTokenRepository refreshTokenRepository)
         {
             _userRepository = userRepository;
-            _passwordHasher = passwordHasher;
+            // _passwordHasher = passwordHasher;
             _memoryCache = memoryCache;
             _refreshTokenRepository = refreshTokenRepository;
         }
@@ -47,11 +49,14 @@ namespace CompanyManagementSystem.Application.Features.Commands.ResetPassword
                 throw new Exception("Invalid or expired OTP.");
             }
 
-            user.Password = _passwordHasher.HashPassword(request.NewPassword);
-            await _userRepository.UpdateAsync(user);
-            await _userRepository.SaveChangesAsync();
+            // UpdatePasswordAsync goes through UserManager.RemovePasswordAsync + AddPasswordAsync.
+            // This correctly rehashes, updates SecurityStamp, and persists — all in one call.
+            // OLD approach was: user.PasswordHash = _passwordHasher.HashPassword(request.NewPassword);
+            //                   await _userRepository.UpdateAsync(user);
+            //                   await _userRepository.SaveChangesAsync();
+            await _userRepository.UpdatePasswordAsync(user, request.NewPassword);
 
-            await _refreshTokenRepository.DeleteAllUserRefreshTokens(user.UserId);
+            await _refreshTokenRepository.DeleteAllUserRefreshTokens(user.Id);
             _memoryCache.Remove(request.Email, TypeOfValue.PasswordResetOtp);
 
             return new ResetPasswordResponse

@@ -34,7 +34,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateDepartment
                 throw new Exception("This account is banned!");
             }
 
-            if (!owner.IsEmailVerfied)
+            if (!owner.EmailConfirmed)
             {
                 throw new Exception("Please verfiey your email!");
             }
@@ -50,7 +50,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateDepartment
                 throw new Exception("Company not found.");
             }
 
-            if (company.OwnerId != owner.UserId)
+            if (company.OwnerId != owner.Id)
             {
                 throw new Exception("You can only create departments for your own company.");
             }

@@ -39,7 +39,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.RefreshToken
                 throw new Exception("This account is banned!");
             }
 
-            if (!user.IsEmailVerfied)
+            if (!user.EmailConfirmed)
             {
                 throw new Exception("Please verfiey your email!");
             }
@@ -47,8 +47,8 @@ namespace CompanyManagementSystem.Application.Features.Commands.RefreshToken
             var accessToken = _accessTokenGenerator.GenerateAccessJwtToken(user);
             var newRefreshToken = _refreshTokenGenerator.GenerateRefreshToken();
 
-            await _refreshTokenRepository.DeleteAllUserRefreshTokens(user.UserId);
-            await _refreshTokenRepository.CreateRefreshToken(user.UserId, newRefreshToken);
+            await _refreshTokenRepository.DeleteAllUserRefreshTokens(user.Id);
+            await _refreshTokenRepository.CreateRefreshToken(user.Id, newRefreshToken);
 
             return new RefreshTokenResponse
             {

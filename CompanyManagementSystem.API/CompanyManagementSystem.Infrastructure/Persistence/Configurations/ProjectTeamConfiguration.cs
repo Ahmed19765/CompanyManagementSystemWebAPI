@@ -14,17 +14,18 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
             // Composite Key
             builder.HasKey(pt => new { pt.ProjectId, pt.TeamId });
 
-            // Project relationship
+            // Project relationship — delete project → delete its team assignments
+            // ClientCascade: EF handles it in memory to avoid multiple cascade path conflicts
             builder.HasOne(pt => pt.Project)
                    .WithMany(p => p.AssignedTeams)
                    .HasForeignKey(pt => pt.ProjectId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.ClientCascade);
 
             // Team relationship
             builder.HasOne(pt => pt.Team)
                    .WithMany(t => t.AssignedProjects)
                    .HasForeignKey(pt => pt.TeamId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
 
             builder.Property(pt => pt.AssignedAt)
                    .IsRequired();

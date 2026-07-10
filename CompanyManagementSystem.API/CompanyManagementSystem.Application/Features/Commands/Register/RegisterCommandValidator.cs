@@ -27,8 +27,5 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
             .NotEmpty()
             .MinimumLength(8)
             .MaximumLength(60);
-
-        RuleFor(x => x.Role)
-            .NotEmpty();
     }
 }

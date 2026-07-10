@@ -36,6 +36,68 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .AnyAsync(t => t.DepartmentId == departmentId && t.TeamName == teamName);
         }
 
+        public async Task<IEnumerable<Team>> GetAllByDepartmentIdAsync(int departmentId)
+        {
+            return await _context.Teams
+                .Where(t => t.DepartmentId == departmentId)
+                .Include(t => t.Leader)
+                .Include(t => t.UserTeams)
+                    .ThenInclude(ut => ut.User)
+                .ToListAsync();
+        }
+
+        public async Task<Team?> GetWithMembersAsync(int teamId)
+        {
+            return await _context.Teams
+                .Include(t => t.Leader)
+                .Include(t => t.UserTeams)
+                    .ThenInclude(ut => ut.User)
+                .FirstOrDefaultAsync(t => t.TeamId == teamId);
+        }
+
+        public async Task<IEnumerable<Team>> GetAllByLeaderIdAsync(Guid leaderId)
+        {
+            return await _context.Teams
+                .Where(t => t.LeaderId == leaderId)
+                .Include(t => t.UserTeams)
+                    .ThenInclude(ut => ut.User)
+                .Include(t => t.Department)
+                .ToListAsync();
+        }
+
+        public async Task<int> CompanyIdFromTeamId(int TeamId)
+        {
+            var team = await _context.Teams
+                .Include(t => t.Department)
+                .FirstOrDefaultAsync(t => t.TeamId == TeamId);
+            if (team == null)
+            {
+                throw new Exception("Team not found.");
+            }
+            return team.Department?.CompanyId ?? 0;
+        }
+
+        public async Task RemoveUserFromAllTeamsInCompanyAsync(int companyId, Guid userId)
+        {
+            // Get all team IDs that belong to this company
+            var teamIdsInCompany = await _context.Teams
+                .Where(t => t.Department.CompanyId == companyId)
+                .Select(t => t.TeamId)
+                .ToListAsync();
+
+            if (!teamIdsInCompany.Any()) return;
+
+            // 1. Delete all UserTeam rows for this user in those teams
+            await _context.UserTeams
+                .Where(ut => ut.UserId == userId && teamIdsInCompany.Contains(ut.TeamId))
+                .ExecuteDeleteAsync();
+
+            // 2. Null out LeaderId on any team this user was leading
+            await _context.Teams
+                .Where(t => teamIdsInCompany.Contains(t.TeamId) && t.LeaderId == userId)
+                .ExecuteUpdateAsync(s => s.SetProperty(t => t.LeaderId, (Guid?)null));
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

@@ -4,12 +4,13 @@
     {
         public int DepartmentId { get; set; }
         public string? DepartmentName { get; set; }
+        public string? DepartmentDescription { get; set; }
 
-
-        public int CompanyId { get; set; }
+        // Nullable — a team can be unlinked from its department if the department is deleted,
+        // and reassigned to a new one later.
+        public int? CompanyId { get; set; }
         public Company? Company { get; set; }
 
         public ICollection<Team> Teams { get; set; } = new List<Team>();
-
     }
 }

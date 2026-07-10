@@ -17,17 +17,20 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
             builder.Property(ut => ut.TeamRole)
                    .HasMaxLength(100);
 
-            // User relationship
+            // Delete User → EF handles removing UserTeam rows in memory
+            // Avoids multiple cascade path conflict:
+            //   AspNetUsers → Companies → Departments → Teams → UserTeams
+            //   AspNetUsers →                                    UserTeams  ← second path
             builder.HasOne(ut => ut.User)
                    .WithMany(u => u.UserTeams)
                    .HasForeignKey(ut => ut.UserId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.ClientCascade);
 
-            // Team relationship
+            // Delete Team → delete its UserTeam rows (single cascade path ✅)
             builder.HasOne(ut => ut.Team)
                    .WithMany(t => t.UserTeams)
                    .HasForeignKey(ut => ut.TeamId)
-                   .OnDelete(DeleteBehavior.Restrict); 
+                   .OnDelete(DeleteBehavior.Cascade);
 
 
         }

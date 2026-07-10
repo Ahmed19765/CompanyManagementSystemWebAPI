@@ -32,13 +32,13 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
             builder.HasOne(co => co.Company)
                    .WithMany(c => c.CompanyOffers)
                    .HasForeignKey(co => co.CompanyId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.Cascade);
 
-            // Project relationship
+            // Project relationship — ClientCascade to match ProjectConfiguration
             builder.HasOne(co => co.Project)
                    .WithMany(p => p.CompanyOffers)
                    .HasForeignKey(co => co.ProjectId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

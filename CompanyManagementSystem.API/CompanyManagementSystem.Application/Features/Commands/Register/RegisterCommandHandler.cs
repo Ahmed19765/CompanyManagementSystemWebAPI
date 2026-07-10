@@ -15,7 +15,9 @@ namespace CompanyManagementSystem.Application.Features.Commands.Register
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
-        private readonly IPasswordHasher _passwordHasher;
+        // IPasswordHasher kept — still used in other places (ResetPassword).
+        // Not needed here anymore because CreateAsync handles hashing internally.
+        // private readonly IPasswordHasher _passwordHasher;
         private readonly IOtpGenerator _otpGenerator;
         private readonly IOtpSender<string> _otpSender;
         private readonly IMemoryCache<string> _memoryCache;
@@ -24,7 +26,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Register
         public RegisterCommandHandler(
             IUserRepository userRepository,
             ICompanyRepository companyRepository,
-            IPasswordHasher passwordHasher,
+            // IPasswordHasher passwordHasher,  // no longer needed here
             IOtpGenerator otpGenerator,
             IOtpSender<string> otpSender,
             IMemoryCache<string> memoryCache,
@@ -32,7 +34,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Register
         {
             _userRepository = userRepository;
             _companyRepository = companyRepository;
-            _passwordHasher = passwordHasher;
+            // _passwordHasher = passwordHasher;
             _otpGenerator = otpGenerator;
             _otpSender = otpSender;
             _memoryCache = memoryCache;
@@ -54,23 +56,30 @@ namespace CompanyManagementSystem.Application.Features.Commands.Register
                 throw new Exception("Username is already taken.");
             }
 
+            // 2. Build the user object — do NOT set PasswordHash manually.
+            //    CreateAsync will hash the password and set NormalizedEmail,
+            //    NormalizedUserName, and SecurityStamp automatically.
             var user = new User
             {
                 FirstName = request.FirstName,
                 LastName = request.LastName,
                 UserName = request.UserName,
                 Email = request.Email,
-                Password = _passwordHasher.HashPassword(request.Password),
+                // PasswordHash = _passwordHasher.HashPassword(request.Password), // OLD — bypassed Identity pipeline
                 Role = request.Role,
-                IsEmailVerfied = false,
+                EmailConfirmed = false,
                 IsBanned = false,
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _userRepository.AddAsync(user);
-            await _userRepository.SaveChangesAsync();
+            // 3. Create via UserManager — handles hashing + normalization + SecurityStamp
+            var errors = await _userRepository.CreateAsync(user, request.Password);
+            if (errors.Any())
+            {
+                throw new Exception(string.Join(" ", errors));
+            }
 
-            // 5. Send OTP for verification
+            // 4. Send OTP for email verification
             var otp = _otpGenerator.GenerateOtp();
 
             _memoryCache.Save(

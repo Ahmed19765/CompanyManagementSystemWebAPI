@@ -1,22 +1,32 @@
 using CompanyManagementSystem.Application.Interfaces.Services.RegistrationAndLogin;
-using Org.BouncyCastle.Crypto.Generators;
-using System;
-using System.Security.Cryptography;
+using CompanyManagementSystem.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace CompanyManagementSystem.Infrastructure.Services
 {
+    // Adapts Identity's IPasswordHasher<User> to our existing IPasswordHasher interface.
+    // The Application layer never changes — it still calls IPasswordHasher.HashPassword/VerifyPassword.
+    // BCrypt.Net is no longer needed.
     public class PasswordHasher : IPasswordHasher
     {
-        private const int WorkFactor = 10; // Secuirty Increase with Increasing but lower proformance
+        private readonly IPasswordHasher<User> _identityHasher;
+
+        public PasswordHasher(IPasswordHasher<User> identityHasher)
+        {
+            _identityHasher = identityHasher;
+        }
 
         public string HashPassword(string password)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password, WorkFactor);
+            // Passing null! for the user instance is fine — Identity's default PBKDF2 hasher
+            // does not use the user object when hashing.
+            return _identityHasher.HashPassword(null!, password);
         }
 
         public bool VerifyPassword(string password, string hashedPassword)
         {
-            return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+            var result = _identityHasher.VerifyHashedPassword(null!, hashedPassword, password);
+            return result != PasswordVerificationResult.Failed;
         }
     }
 }

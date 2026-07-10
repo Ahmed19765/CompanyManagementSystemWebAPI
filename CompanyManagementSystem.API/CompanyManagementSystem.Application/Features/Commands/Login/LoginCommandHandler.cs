@@ -44,7 +44,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Login
             }
 
             // 2. Verify password
-            if (!_passwordHasher.VerifyPassword(request.Password, user.Password!))
+            if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash!))
             {
                 throw new Exception("Invalid email or password.");
             }
@@ -64,8 +64,8 @@ namespace CompanyManagementSystem.Application.Features.Commands.Login
             var refreshTokenString = _refreshTokenGenerator.GenerateRefreshToken();
 
             // 4. Replace all old refresh tokens with one new token
-            await _refreshTokenRepository.DeleteAllUserRefreshTokens(user.UserId);
-            await _refreshTokenRepository.CreateRefreshToken(user.UserId, refreshTokenString);
+            await _refreshTokenRepository.DeleteAllUserRefreshTokens(user.Id);
+            await _refreshTokenRepository.CreateRefreshToken(user.Id, refreshTokenString);
 
             return new LoginResponse
             {

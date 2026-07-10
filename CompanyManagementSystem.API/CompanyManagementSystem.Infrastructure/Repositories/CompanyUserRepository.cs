@@ -64,6 +64,29 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             userCom.Rank = Domain.Enumerations.CompanyRank.Leader;
         }
 
+        public async Task<IEnumerable<CompanyUser>> GetAllMembersByCompanyIdAsync(int companyId)
+        {
+            return await _context.CompanyUsers
+                .Where(cu => cu.CompanyId == companyId)
+                .Include(cu => cu.User)
+                .ToListAsync();
+        }
+
+        public async Task RemoveMemberAsync(int companyId, Guid userId)
+        {
+            await _context.CompanyUsers
+                .Where(cu => cu.CompanyId == companyId && cu.UserId == userId)
+                .ExecuteDeleteAsync();
+        }
+
+        public async Task RemoveAllMembersAsync(int companyId)
+        {
+            // Bulk-delete every membership row for this company in one DB round-trip
+            await _context.CompanyUsers
+                .Where(cu => cu.CompanyId == companyId)
+                .ExecuteDeleteAsync();
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

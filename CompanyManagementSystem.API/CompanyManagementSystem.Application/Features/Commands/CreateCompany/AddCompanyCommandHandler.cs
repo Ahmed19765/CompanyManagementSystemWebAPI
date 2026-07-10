@@ -33,7 +33,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateCompany
                 throw new Exception("This account is banned!");
             }
 
-            if (!owner.IsEmailVerfied)
+            if (!owner.EmailConfirmed)
             {
                 throw new Exception("Please verfiey your email!");
             }
@@ -53,7 +53,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateCompany
                 CompanyName = request.CompanyName,
                 CompanyDescription = request.CompanyDescription,
                 JoinCode = Guid.NewGuid().ToString(),
-                OwnerId = owner.UserId
+                OwnerId = owner.Id
             };
 
             await _companyRepository.AddAsync(company);

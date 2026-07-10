@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -17,6 +17,7 @@ namespace CompanyManagementSystem.Application.Interfaces.Services.MemoryCache
     {
         OTP,
         EmailVerificationOtp,
-        PasswordResetOtp
+        PasswordResetOtp,
+        DeleteAccountOtp
     }
 }

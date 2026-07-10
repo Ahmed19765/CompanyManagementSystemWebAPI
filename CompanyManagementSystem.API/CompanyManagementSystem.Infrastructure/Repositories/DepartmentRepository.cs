@@ -39,6 +39,53 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .AnyAsync(d => d.CompanyId == Company.CompanyId && d.DepartmentName == departmentName);
         }
 
+        public async Task<bool> ExistsByNameInCompanyAsync(int companyId, string departmentName, int? excludedDepartmentId = null)
+        {
+            return await _context.Departments
+                .AnyAsync(d =>
+                    d.CompanyId == companyId &&
+                    d.DepartmentName == departmentName &&
+                    (!excludedDepartmentId.HasValue || d.DepartmentId != excludedDepartmentId.Value));
+        }
+
+        public async Task<IEnumerable<Department>> GetAllByCompanyIdAsync(int companyId)
+        {
+            return await _context.Departments
+                .Where(d => d.CompanyId == companyId)
+                .Include(d => d.Teams)
+                .ToListAsync();
+        }
+
+        public async Task DeleteAllByCompanyIdAsync(int companyId)
+        {
+            // Teams cascade-delete from Departments (ClientCascade in EF config),
+            // and UserTeams cascade-delete from Teams.
+            // We load them into memory first so EF's ClientCascade interceptors fire correctly.
+            var departments = await _context.Departments
+                .Where(d => d.CompanyId == companyId)
+                .Include(d => d.Teams)
+                    .ThenInclude(t => t.UserTeams)
+                .ToListAsync();
+
+            _context.Departments.RemoveRange(departments);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteDepartmentAsync(int departmentId)
+        {
+            // Load with teams so EF's ClientSetNull interceptor
+            // nulls Team.DepartmentId before the department row is removed.
+            // Teams survive — they can be reassigned to another department later.
+            var department = await _context.Departments
+                .Include(d => d.Teams)
+                .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
+
+            if (department is null) return;
+
+            _context.Departments.Remove(department);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

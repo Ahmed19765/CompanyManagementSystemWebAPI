@@ -1,17 +1,19 @@
 ﻿using CompanyManagementSystem.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using CompanyManagementSystem.Infrastructure.Persistence.Configurations;
 
 
 namespace CompanyManagementSystem.Infrastructure.Persistence
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
 
-        public DbSet<User> Users { get; set; } = null!;
+        // DbSet<User> is already exposed by IdentityDbContext — do not redeclare it
         public DbSet<Company> Companies { get; set; } = null!;
         public DbSet<Department> Departments { get; set; } = null!;
         public DbSet<Team> Teams { get; set; } = null!;
@@ -26,6 +28,7 @@ namespace CompanyManagementSystem.Infrastructure.Persistence
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Must call base first — this registers all Identity tables
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfiguration(new CompanyConfiguration());

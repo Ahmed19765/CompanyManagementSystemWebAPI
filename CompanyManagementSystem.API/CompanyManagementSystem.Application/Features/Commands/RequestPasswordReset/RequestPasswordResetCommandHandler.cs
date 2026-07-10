@@ -44,9 +44,9 @@ namespace CompanyManagementSystem.Application.Features.Commands.RequestPasswordR
                 throw new Exception("This account is banned!");
             }
 
-            if (user.IsEmailVerfied)
+            if (!user.EmailConfirmed)
             {
-                throw new Exception("This account is not verfied!");
+                throw new Exception("Please verify your email before resetting your password!");
             }
 
             var otp = _otpGenerator.GenerateOtp();

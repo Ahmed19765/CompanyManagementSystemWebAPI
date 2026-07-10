@@ -31,7 +31,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateProject
                 throw new Exception("This account is banned!");
             }
 
-            if (!customer.IsEmailVerfied)
+            if (!customer.EmailConfirmed)
             {
                 throw new Exception("Please verfiey your email!");
             }
@@ -48,7 +48,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateProject
                 ProjectDocumentsUrl = request.ProjectDocumentsUrl,
                 ProjectOfferedBudget = request.ProjectOfferedBudget,
                 UploadedDate = DateTime.UtcNow,
-                CustomerId = customer.UserId
+                CustomerId = customer.Id
             };
 
             await _projectRepository.AddAsync(project);

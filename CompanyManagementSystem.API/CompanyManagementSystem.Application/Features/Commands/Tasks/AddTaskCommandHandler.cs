@@ -35,6 +35,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
         {
             // 1. Get creator info
             var creator = await _userRepository.GetByIdAsync(request.CurrentUserId);
+
             if (creator == null)
             {
                 throw new Exception("Current user (creator) not found.");
@@ -58,19 +59,21 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
                 throw new Exception("Team department not found.");
             }
 
-            var companyId = team.Department.CompanyId;
-            var creatorOwnsCompany = team.Department.Company?.OwnerId == creator.UserId;
-            var creatorMembership = await _companyUserRepository.GetMembershipAsync(companyId, creator.UserId);
+            var companyId = team.Department.CompanyId ?? 0;
+            var creatorOwnsCompany = team.Department.Company?.OwnerId == creator.Id;
+            var creatorMembership = await _companyUserRepository.GetMembershipAsync(companyId, creator.Id);
 
             if (!creatorOwnsCompany && creatorMembership is null)
             {
                 throw new Exception("You are not a member of this company.");
             }
 
+            /*
             if (!creatorOwnsCompany && creatorMembership?.Rank != CompanyRank.Leader)
             {
                 throw new Exception("Only company owners or leaders can add/assign tasks.");
             }
+            */
 
             // 3. Validate AssignedTo user if provided
             User? assignedToUser = null;
@@ -88,7 +91,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
                     throw new Exception("Tasks can only be assigned to engineers.");
                 }
 
-                assignedToMembership = await _companyUserRepository.GetMembershipAsync(companyId, assignedToUser.UserId);
+                assignedToMembership = await _companyUserRepository.GetMembershipAsync(companyId, assignedToUser.Id);
                 if (assignedToMembership is null)
                 {
                     throw new Exception("Assigned user must belong to the same company as the team.");
@@ -103,7 +106,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
             else if (creatorMembership?.Rank == CompanyRank.Leader)
             {
                 // Leader must lead the specified team
-                if (team.LeaderId != creator.UserId)
+                if (team.LeaderId != creator.Id)
                 {
                     throw new Exception("You can only assign tasks to teams you are leading.");
                 }
@@ -111,7 +114,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
                 // Leader can only assign to members of their team
                 if (assignedToUser != null)
                 {
-                    bool isMember = team.UserTeams.Any(ut => ut.UserId == assignedToUser.UserId);
+                    bool isMember = team.UserTeams.Any(ut => ut.UserId == assignedToUser.Id);
                     if (!isMember)
                     {
                         throw new Exception("Leaders can only assign tasks to members of their team.");
@@ -127,7 +130,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
                 TaskDescription = request.Description,
                 ProjectId = request.ProjectId,
                 TeamId = request.TeamId,
-                AssignedById = creator.UserId,
+                AssignedById = creator.Id,
                 AssignedToId = request.AssignedToId,
                 Status = TaskState.Todo,
                 DueDate = request.DueDate,

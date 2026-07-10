@@ -7,13 +7,13 @@ namespace CompanyManagementSystem.Domain.Entities
         public string? TeamName { get; set; }
         public string? TeamDescription { get; set; }
 
-        // Team Leader
-        public Guid LeaderId { get; set; }
-        public User Leader { get; set; } = null!;
+        // Team Leader — nullable so EF can ClientSetNull when the leader user is deleted
+        public Guid? LeaderId { get; set; }
+        public User? Leader { get; set; }
 
-        // Department relation
-        public int DepartmentId { get; set; }
-        public Department Department { get; set; } = null!;
+        // Department relation — nullable so a team can survive if its department is deleted
+        public int? DepartmentId { get; set; }
+        public Department? Department { get; set; }
 
         // Team members
         public ICollection<UserTeam> UserTeams { get; set; } = new List<UserTeam>();

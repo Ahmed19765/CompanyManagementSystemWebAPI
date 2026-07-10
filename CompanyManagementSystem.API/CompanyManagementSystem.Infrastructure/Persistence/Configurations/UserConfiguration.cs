@@ -11,40 +11,22 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            // Primary Key
-            builder.HasKey(u => u.UserId);
+            // Identity already configures: Id (PK), UserName, NormalizedUserName (unique index),
+            // Email, NormalizedEmail (unique index), EmailConfirmed, PasswordHash,
+            // SecurityStamp, ConcurrencyStamp, PhoneNumber, TwoFactorEnabled,
+            // LockoutEnd, LockoutEnabled, AccessFailedCount.
+            // Do NOT redefine those — it causes EF conflicts.
 
-            // Properties
+            // Custom domain columns only
             builder.Property(u => u.FirstName)
                    .HasMaxLength(100);
 
             builder.Property(u => u.LastName)
                    .HasMaxLength(100);
 
-            builder.Property(u => u.UserName)
-                   .HasMaxLength(50)
-                   .IsRequired();
-
-            builder.Property(u => u.Email)
-                   .HasMaxLength(100)
-                   .IsRequired();
-
-            builder.HasIndex(u => u.Email)
-                   .IsUnique();
-
-            builder.HasIndex(u => u.UserName)
-                   .IsUnique();
-
-            builder.Property(u => u.Password)
-                   .HasMaxLength(255)
-                   .IsRequired();
-
             builder.Property(u => u.Role)
                    .HasMaxLength(50)
                    .HasConversion<string>();
-
-            builder.Property(u => u.IsEmailVerfied)
-                   .IsRequired();
 
             builder.Property(u => u.IsBanned)
                    .IsRequired();
@@ -52,12 +34,11 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
             builder.Property(u => u.CreatedAt)
                    .IsRequired();
 
-            // User -> Teams he leads
+            // Relationships — unchanged, FK columns are still Guid pointing to User.Id
             builder.HasMany(u => u.LeadingTeams)
                    .WithOne(t => t.Leader)
                    .HasForeignKey(t => t.LeaderId);
 
-            // User <-> UserTeam
             builder.HasMany(u => u.UserTeams)
                    .WithOne(ut => ut.User)
                    .HasForeignKey(ut => ut.UserId);
@@ -66,30 +47,23 @@ namespace CompanyManagementSystem.Infrastructure.Persistence.Configurations
                    .WithOne(cu => cu.User)
                    .HasForeignKey(cu => cu.UserId);
 
-            // User -> Owned Projects
             builder.HasMany(u => u.OwnedProjects)
                    .WithOne(p => p.Customer)
                    .HasForeignKey(p => p.CustomerId);
 
-            // User -> Tasks created by him
             builder.HasMany(u => u.AssignedByMe)
                    .WithOne(t => t.AssignedBy)
                    .HasForeignKey(t => t.AssignedById)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.SetNull);
 
-            // User -> Tasks assigned to him
             builder.HasMany(u => u.AssignedToMe)
                    .WithOne(t => t.AssignedTo)
                    .HasForeignKey(t => t.AssignedToId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.SetNull);
 
-            // Refresh Tokens
             builder.HasMany(u => u.RefreshToken)
                    .WithOne(rt => rt.User)
                    .HasForeignKey(rt => rt.UserId);
-
-            builder.HasIndex(u => u.UserName)
-                   .IsUnique();
         }
     }
 }

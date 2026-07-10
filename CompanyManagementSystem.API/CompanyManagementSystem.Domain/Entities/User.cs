@@ -1,24 +1,23 @@
 using CompanyManagementSystem.Domain.Enumerations;
+using Microsoft.AspNetCore.Identity;
 
 namespace CompanyManagementSystem.Domain.Entities
 {
-    public class User
+    // Inheriting IdentityUser<Guid> provides:
+    //   Id (replaces UserId), UserName, NormalizedUserName,
+    //   Email, NormalizedEmail, EmailConfirmed (replaces IsEmailVerfied),
+    //   PasswordHash (replaces Password), SecurityStamp, ConcurrencyStamp,
+    //   PhoneNumber, TwoFactorEnabled, LockoutEnd, LockoutEnabled, AccessFailedCount
+    public class User : IdentityUser<Guid>
     {
-        public Guid UserId { get; set; } = Guid.NewGuid();
-
+        // Custom domain fields — kept as-is
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public string? UserName { get; set; }
-        public string? Email { get; set; }
-        public string? Password { get; set; }
         public UserRole Role { get; set; }
-
-        public bool IsEmailVerfied { get; set; } = false;
         public bool IsBanned { get; set; } = false;
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Company relation (Owner)
+        // All domain navigation properties — unchanged
         public ICollection<Company> OwnedCompanies { get; set; }
             = new List<Company>();
 
@@ -43,5 +42,4 @@ namespace CompanyManagementSystem.Domain.Entities
         public ICollection<RefreshToken> RefreshToken { get; set; }
             = new List<RefreshToken>();
     }
-
 }

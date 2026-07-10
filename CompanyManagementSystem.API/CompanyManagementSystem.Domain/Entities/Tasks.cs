@@ -18,12 +18,13 @@ namespace CompanyManagementSystem.Domain.Entities
         public int ProjectId { get; set; }
         public Project? Project { get; set; }
 
-        // Team this task belongs to
-        public int TeamId { get; set; }
+        // Team this task belongs to — nullable so task can survive if team is deleted
+        public int? TeamId { get; set; }
         public Team? Team { get; set; }
 
         // Who CREATED / ASSIGNED this task (TeamLead or Owner)
-        public Guid AssignedById { get; set; }
+        // Nullable so EF can ClientSetNull when the assigning user is deleted
+        public Guid? AssignedById { get; set; }
         public User? AssignedBy { get; set; }
 
         // Who is DOING this task (Engineer)

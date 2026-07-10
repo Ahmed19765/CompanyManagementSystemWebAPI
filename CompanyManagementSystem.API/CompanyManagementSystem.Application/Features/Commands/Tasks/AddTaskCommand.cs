@@ -1,5 +1,6 @@
 using MediatR;
 using System;
+using System.Text.Json.Serialization;
 
 namespace CompanyManagementSystem.Application.Features.Commands.Tasks
 {
@@ -17,6 +18,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
         public string? AttachmentUrl { get; set; }
         public string? AcceptanceCriteria { get; set; }
 
+        [JsonIgnore]
         // Injected from JWT Claims in Controller
         public Guid CurrentUserId { get; set; }
     }
