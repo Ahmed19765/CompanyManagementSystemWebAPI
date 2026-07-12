@@ -16,7 +16,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Company?> GetByIdAsync(int id)
+        public async Task<Company?> GetByIdAsync(Guid id)
         {
             return await _context.Companies
                 .FirstOrDefaultAsync(c => c.CompanyId == id);
@@ -28,7 +28,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .FirstOrDefaultAsync(c => c.CompanyName == companyName);
         }
 
-        public async Task<int?> GetCompanyIdFromNameAsync(string companyName)
+        public async Task<Guid?> GetCompanyIdFromNameAsync(string companyName)
         {
             return await _context.Companies
                 .Where(c => c.CompanyName == companyName)
@@ -57,10 +57,12 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
         {
             return await _context.Companies
                 .Where(c => c.OwnerId == ownerId && !c.IsDeleted)
+                .Include(c => c.CompanyUsers)
+                .Include(c => c.Departments)
                 .ToListAsync();
         }
 
-        public async Task<Company?> GetWithDetailsAsync(int companyId)
+        public async Task<Company?> GetWithDetailsAsync(Guid companyId)
         {
             return await _context.Companies
                 .Include(c => c.CompanyUsers)
@@ -71,7 +73,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .FirstOrDefaultAsync(c => c.CompanyId == companyId && !c.IsDeleted);
         }
 
-        public async Task SoftDeleteAsync(int companyId)
+        public async Task SoftDeleteAsync(Guid companyId)
         {
             await _context.Companies
                 .Where(c => c.CompanyId == companyId)
@@ -80,7 +82,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                     .SetProperty(c => c.DeletedAt,  DateTime.UtcNow));
         }
 
-        public async Task<bool> HasActiveOffersAsync(int companyId)
+        public async Task<bool> HasActiveOffersAsync(Guid companyId)
         {
             var blockingStatuses = new[] { OfferStatus.Pending, OfferStatus.Accepted };
 

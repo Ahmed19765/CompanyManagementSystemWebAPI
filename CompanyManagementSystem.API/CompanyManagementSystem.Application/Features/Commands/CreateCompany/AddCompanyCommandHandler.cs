@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Entities;
 using CompanyManagementSystem.Domain.Enumerations;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.CreateCompany
 {
-    public class CompanyCommandHandler : IRequestHandler<AddCompanyCommand, CompanyCreationResponse>
+    public class CompanyCommandHandler : IRequestHandler<AddCompanyCommand, Response<string>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -18,7 +19,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateCompany
             _companyRepository = companyRepository;
         }
 
-        public async Task<CompanyCreationResponse> Handle(AddCompanyCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(AddCompanyCommand request, CancellationToken cancellationToken)
         {
             var owner = await _userRepository.GetByIdAsync(request.OwnerId);
             var CompanyExist = await _companyRepository.IsCompanyExistWithSameName(request.CompanyName);
@@ -59,10 +60,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateCompany
             await _companyRepository.AddAsync(company);
             await _companyRepository.SaveChangesAsync();
 
-            return new CompanyCreationResponse
-            {
-                Message = "Company created successfully."
-            };
+            return Response<string>.Ok(null!, "Company created successfully.");
         }
     }
 }

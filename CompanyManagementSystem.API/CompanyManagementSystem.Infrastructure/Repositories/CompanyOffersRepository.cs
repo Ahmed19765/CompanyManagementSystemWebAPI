@@ -14,21 +14,22 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<CompanyOffers?> GetByIdAsync(int companyId, int projectId)
+        public async Task<CompanyOffers?> GetByIdAsync(Guid companyId, Guid projectId)
         {
             return await _context.CompanyOffers
+                .Include(co => co.Company)
                 .FirstOrDefaultAsync(co => co.CompanyId == companyId
                                         && co.ProjectId == projectId);
         }
 
-        public async Task<bool> ExistsAsync(int companyId, int projectId)
+        public async Task<bool> ExistsAsync(Guid companyId, Guid projectId)
         {
             return await _context.CompanyOffers
                 .AnyAsync(co => co.CompanyId == companyId
                              && co.ProjectId == projectId);
         }
 
-        public async Task<IEnumerable<CompanyOffers>> GetAllByProjectIdAsync(int projectId)
+        public async Task<IEnumerable<CompanyOffers>> GetAllByProjectIdAsync(Guid projectId)
         {
             return await _context.CompanyOffers
                 .Where(co => co.ProjectId == projectId)
@@ -36,7 +37,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task AcceptOfferAndRejectOthersAsync(int chosenCompanyId, int projectId)
+        public async Task AcceptOfferAndRejectOthersAsync(Guid chosenCompanyId, Guid projectId)
         {
             // Set chosen offer → Accepted
             await _context.CompanyOffers

@@ -7,7 +7,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateDepartment
         public UpdateDepartmentCommandValidator()
         {
             RuleFor(x => x.DepartmentId)
-                .GreaterThan(0).WithMessage("Department id is required.");
+                .NotEmpty().WithMessage("Department id is required.");
 
             RuleFor(x => x.DepartmentName)
                 .NotEmpty().WithMessage("Department name is required.")

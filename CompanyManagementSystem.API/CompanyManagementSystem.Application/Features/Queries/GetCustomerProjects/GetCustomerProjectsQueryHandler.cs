@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Queries.GetCustomerProjects
 {
     public class GetCustomerProjectsQueryHandler
-        : IRequestHandler<GetCustomerProjectsQuery, GetCustomerProjectsResponse>
+        : IRequestHandler<GetCustomerProjectsQuery, Response<IEnumerable<CustomerProjectDto>>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
@@ -18,7 +19,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetCustomerProjec
             _projectRepository = projectRepository;
         }
 
-        public async Task<GetCustomerProjectsResponse> Handle(
+        public async Task<Response<IEnumerable<CustomerProjectDto>>> Handle(
             GetCustomerProjectsQuery request,
             CancellationToken cancellationToken)
         {
@@ -53,7 +54,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetCustomerProjec
                 })
             });
 
-            return new GetCustomerProjectsResponse { Projects = dtos };
+            return Response<IEnumerable<CustomerProjectDto>>.Ok(dtos, "Projects retrieved successfully.");
         }
     }
 }

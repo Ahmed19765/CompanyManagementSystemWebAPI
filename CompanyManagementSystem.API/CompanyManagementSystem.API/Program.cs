@@ -1,3 +1,4 @@
+using CompanyManagementSystem.API.Middleware;
 using CompanyManagementSystem.Application;
 using CompanyManagementSystem.Application.Settings;
 using CompanyManagementSystem.Infrastructure;
@@ -77,6 +78,7 @@ namespace CompanyManagementSystem.API
             var app = builder.Build();
             // Configure the HTTP request pipeline.
 
+            app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseHttpsRedirection();
 
             if (app.Environment.IsDevelopment())

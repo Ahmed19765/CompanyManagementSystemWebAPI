@@ -1,0 +1,154 @@
+### ─────────────────────────────────────────────────
+### BASE URL — change port if yours differs
+### ─────────────────────────────────────────────────
+@baseUrl = https://localhost:7001
+@contentType = application/json
+
+### ─────────────────────────────────────────────────
+### 1. Register — Owner
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Ahmed",
+  "lastName": "Owner",
+  "userName": "ahmed_owner",
+  "email": "ahmed_owner@gmail.com",
+  "password": "Password123",
+  "role": "Owner"
+}
+
+### ─────────────────────────────────────────────────
+### 2. Register — Customer
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Sara",
+  "lastName": "Customer",
+  "userName": "sara_customer",
+  "email": "sara_customer@gmail.com",
+  "password": "Password123",
+  "role": "Customer"
+}
+
+### ─────────────────────────────────────────────────
+### 3. Register — Engineer
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/register
+Content-Type: {{contentType}}
+
+{
+  "firstName": "Mohamed",
+  "lastName": "Engineer",
+  "userName": "mohamed_eng",
+  "email": "mohamed_eng@gmail.com",
+  "password": "Password123",
+  "role": "Engineer"
+}
+
+### ─────────────────────────────────────────────────
+### 4. Verify Email (paste OTP from your email)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/verify-email
+Content-Type: {{contentType}}
+
+{
+  "email": "ahmed_owner@gmail.com",
+  "otp": "123456"
+}
+
+### ─────────────────────────────────────────────────
+### 5. Resend Email Verification OTP
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/resend-email-verification-otp
+Content-Type: {{contentType}}
+
+{
+  "email": "ahmed_owner@gmail.com"
+}
+
+### ─────────────────────────────────────────────────
+### 6. Login — Owner
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "ahmed_owner@gmail.com",
+  "password": "Password123"
+}
+
+### ─────────────────────────────────────────────────
+### 7. Login — Customer
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "sara_customer@gmail.com",
+  "password": "Password123"
+}
+
+### ─────────────────────────────────────────────────
+### 8. Login — Engineer
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "mohamed_eng@gmail.com",
+  "password": "Password123"
+}
+
+### ─────────────────────────────────────────────────
+### 9. Refresh Token
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/refresh
+Content-Type: {{contentType}}
+
+{
+  "refreshToken": "PASTE_REFRESH_TOKEN_HERE"
+}
+
+### ─────────────────────────────────────────────────
+### 10. Request Password Reset OTP
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/request-password-reset
+Content-Type: {{contentType}}
+
+{
+  "email": "ahmed_owner@gmail.com"
+}
+
+### ─────────────────────────────────────────────────
+### 11. Reset Password (paste OTP from email)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/reset-password
+Content-Type: {{contentType}}
+
+{
+  "email": "ahmed_owner@gmail.com",
+  "otp": "123456",
+  "newPassword": "NewPassword123"
+}
+
+### ─────────────────────────────────────────────────
+### 12. Request Delete Account (requires JWT)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/auth/request-delete-account
+Content-Type: {{contentType}}
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+
+### ─────────────────────────────────────────────────
+### 13. Delete Account (requires JWT + OTP)
+### ─────────────────────────────────────────────────
+DELETE {{baseUrl}}/api/auth/delete-account
+Content-Type: {{contentType}}
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+
+{
+  "otp": "123456"
+}

@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Entities;
 using CompanyManagementSystem.Domain.Enumerations;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyMember
 {
-    public class AddCompanyMemberCommandHandler : IRequestHandler<AddCompanyMemberCommand, AddCompanyMemberResponse>
+    public class AddCompanyMemberCommandHandler : IRequestHandler<AddCompanyMemberCommand, Response<AddCompanyMemberResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -24,7 +25,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyMember
             _companyUserRepository = companyUserRepository;
         }
 
-        public async Task<AddCompanyMemberResponse> Handle(AddCompanyMemberCommand request, CancellationToken cancellationToken)
+        public async Task<Response<AddCompanyMemberResponse>> Handle(AddCompanyMemberCommand request, CancellationToken cancellationToken)
         {
             var owner = await _userRepository.GetByIdAsync(request.OwnerId);
             if (owner is null)
@@ -90,12 +91,14 @@ namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyMember
             await _companyUserRepository.AddAsync(newMembership);
             await _companyUserRepository.SaveChangesAsync();
 
-            return new AddCompanyMemberResponse
+            var response = new AddCompanyMemberResponse
             {
                 CompanyId = request.CompanyId,
                 UserName = request.UserName,
                 Message = "Engineer added to the company successfully as a member."
             };
+
+            return Response<AddCompanyMemberResponse>.Ok(response, "Member added successfully.");
         }
     }
 }

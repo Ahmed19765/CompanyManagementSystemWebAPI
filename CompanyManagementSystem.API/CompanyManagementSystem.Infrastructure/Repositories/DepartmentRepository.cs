@@ -14,7 +14,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Department?> GetByIdAsync(int id)
+        public async Task<Department?> GetByIdAsync(Guid id)
         {
             return await _context.Departments
                 .Include(d => d.Company)
@@ -39,7 +39,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .AnyAsync(d => d.CompanyId == Company.CompanyId && d.DepartmentName == departmentName);
         }
 
-        public async Task<bool> ExistsByNameInCompanyAsync(int companyId, string departmentName, int? excludedDepartmentId = null)
+        public async Task<bool> ExistsByNameInCompanyAsync(Guid companyId, string departmentName, Guid? excludedDepartmentId = null)
         {
             return await _context.Departments
                 .AnyAsync(d =>
@@ -48,7 +48,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                     (!excludedDepartmentId.HasValue || d.DepartmentId != excludedDepartmentId.Value));
         }
 
-        public async Task<IEnumerable<Department>> GetAllByCompanyIdAsync(int companyId)
+        public async Task<IEnumerable<Department>> GetAllByCompanyIdAsync(Guid companyId)
         {
             return await _context.Departments
                 .Where(d => d.CompanyId == companyId)
@@ -56,7 +56,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task DeleteAllByCompanyIdAsync(int companyId)
+        public async Task DeleteAllByCompanyIdAsync(Guid companyId)
         {
             // Teams cascade-delete from Departments (ClientCascade in EF config),
             // and UserTeams cascade-delete from Teams.
@@ -71,7 +71,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteDepartmentAsync(int departmentId)
+        public async Task DeleteDepartmentAsync(Guid departmentId)
         {
             // Load with teams so EF's ClientSetNull interceptor
             // nulls Team.DepartmentId before the department row is removed.

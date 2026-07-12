@@ -2,14 +2,14 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetCompanyAccepte
 {
     public class GetCompanyAcceptedProjectsResponse
     {
-        public int CompanyId { get; set; }
+        public Guid CompanyId { get; set; }
         public string CompanyName { get; set; } = null!;
         public IEnumerable<AcceptedProjectDto> Projects { get; set; } = new List<AcceptedProjectDto>();
     }
 
     public class AcceptedProjectDto
     {
-        public int ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public string ProjectTitle { get; set; } = null!;
         public string? ProjectDescription { get; set; }
         public string ProjectStatus { get; set; } = null!;

@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Entities;
 using CompanyManagementSystem.Domain.Enumerations;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CompanyManagementSystem.Application.Features.Commands.Tasks
 {
-    public class AddTaskCommandHandler : IRequestHandler<AddTaskCommand, AddTaskResponse>
+    public class AddTaskCommandHandler : IRequestHandler<AddTaskCommand, Response<AddTaskResponse>>
     {
         private readonly ITaskRepository _taskRepository;
         private readonly IUserRepository _userRepository;
@@ -31,7 +32,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
             _companyUserRepository = companyUserRepository;
         }
 
-        public async Task<AddTaskResponse> Handle(AddTaskCommand request, CancellationToken cancellationToken)
+        public async Task<Response<AddTaskResponse>> Handle(AddTaskCommand request, CancellationToken cancellationToken)
         {
             // 1. Get creator info
             var creator = await _userRepository.GetByIdAsync(request.CurrentUserId);
@@ -59,7 +60,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
                 throw new Exception("Team department not found.");
             }
 
-            var companyId = team.Department.CompanyId ?? 0;
+            var companyId = team.Department.CompanyId ?? Guid.Empty;
             var creatorOwnsCompany = team.Department.Company?.OwnerId == creator.Id;
             var creatorMembership = await _companyUserRepository.GetMembershipAsync(companyId, creator.Id);
 
@@ -146,13 +147,13 @@ namespace CompanyManagementSystem.Application.Features.Commands.Tasks
             await _taskRepository.AddAsync(task);
             await _taskRepository.SaveChangesAsync();
 
-            return new AddTaskResponse
+            return Response<AddTaskResponse>.Ok(new AddTaskResponse
             {
                 TaskId = task.TaskId,
                 Title = task.TaskTitle!,
                 Status = task.Status.ToString(),
                 Message = "Task created successfully with details!"
-            };
+            }, "Task created successfully.");
         }
     }
 }

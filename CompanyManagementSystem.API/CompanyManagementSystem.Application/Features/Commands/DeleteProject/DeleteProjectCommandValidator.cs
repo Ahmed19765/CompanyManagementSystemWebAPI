@@ -7,7 +7,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteProject
         public DeleteProjectCommandValidator()
         {
             RuleFor(x => x.ProjectId)
-                .GreaterThan(0).WithMessage("Project id is required.");
+                .NotEmpty().WithMessage("Project id is required.");
         }
     }
 }

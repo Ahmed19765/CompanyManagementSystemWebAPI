@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Commands.AssignProjectToTeam
 {
     public class AssignProjectToTeamCommandHandler
-        : IRequestHandler<AssignProjectToTeamCommand, AssignProjectToTeamResponse>
+        : IRequestHandler<AssignProjectToTeamCommand, Response<AssignProjectToTeamResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
@@ -27,7 +28,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.AssignProjectToT
             _projectTeamRepository   = projectTeamRepository;
         }
 
-        public async Task<AssignProjectToTeamResponse> Handle(
+        public async Task<Response<AssignProjectToTeamResponse>> Handle(
             AssignProjectToTeamCommand request,
             CancellationToken cancellationToken)
         {
@@ -58,8 +59,8 @@ namespace CompanyManagementSystem.Application.Features.Commands.AssignProjectToT
             if (team.Department is null)
                 throw new Exception("This team is not linked to any department. Please reassign it first.");
 
-            var companyId = team.Department.CompanyId ?? 0;
-            if (companyId == 0)
+            var companyId = team.Department.CompanyId ?? Guid.Empty;
+            if (companyId == Guid.Empty)
                 throw new Exception("This team's department is not linked to any company.");
 
             // ── 4. Verify the owner owns that company ──────────────────────────────
@@ -88,14 +89,14 @@ namespace CompanyManagementSystem.Application.Features.Commands.AssignProjectToT
             await _projectTeamRepository.AssignAsync(request.ProjectId, request.TeamId);
             await _projectTeamRepository.SaveChangesAsync();
 
-            return new AssignProjectToTeamResponse
+            return Response<AssignProjectToTeamResponse>.Ok(new AssignProjectToTeamResponse
             {
                 ProjectId    = project.ProjectId,
                 ProjectTitle = project.ProjectTitle ?? string.Empty,
                 TeamId       = team.TeamId,
                 TeamName     = team.TeamName ?? string.Empty,
                 Message      = $"Project '{project.ProjectTitle}' successfully assigned to team '{team.TeamName}'."
-            };
+            }, "Project assigned to team successfully.");
         }
     }
 }

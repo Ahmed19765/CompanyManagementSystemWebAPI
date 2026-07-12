@@ -1,4 +1,7 @@
+using CompanyManagementSystem.Application.Features.Commands.AddTeamMember;
 using CompanyManagementSystem.Application.Features.Commands.CreateTeam;
+using CompanyManagementSystem.Application.Features.Commands.DeleteTeam;
+using CompanyManagementSystem.Application.Features.Commands.RemoveTeamMember;
 using CompanyManagementSystem.Application.Features.Queries.GetTeamMembers;
 using CompanyManagementSystem.Application.Features.Queries.GetTeamTasks;
 using MediatR;
@@ -8,7 +11,6 @@ using System.Security.Claims;
 
 namespace CompanyManagementSystem.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class TeamController : ControllerBase
     {
@@ -22,51 +24,61 @@ namespace CompanyManagementSystem.API.Controllers
         // ── Commands ───────────────────────────────────────────────────────────────
 
         [Authorize(Roles = "Owner")]
-        [HttpPost("createTeam")]
+        [HttpPost("api/owner/teams")]
         public async Task<IActionResult> CreateTeam([FromBody] CreateTeamCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
+        }
+
+        [Authorize(Roles = "Owner")]
+        [HttpDelete("api/owner/teams")]
+        public async Task<IActionResult> DeleteTeam([FromBody] DeleteTeamCommand command)
+        {
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
+        }
+
+        [Authorize(Roles = "Owner")]
+        [HttpPost("api/owner/teams/members")]
+        public async Task<IActionResult> AddTeamMember([FromBody] AddTeamMemberCommand command)
+        {
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
+        }
+
+        [Authorize(Roles = "Owner")]
+        [HttpDelete("api/owner/teams/members")]
+        public async Task<IActionResult> RemoveTeamMember([FromBody] RemoveTeamMemberCommand command)
+        {
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
         // ── Queries ────────────────────────────────────────────────────────────────
 
-        /// <summary>Owner or TeamLeader: get all members of a team.</summary>
         [Authorize(Roles = "Owner,Engineer")]
-        [HttpGet("{teamId}/members")]
-        public async Task<IActionResult> GetTeamMembers(int teamId)
+        [HttpGet("api/teams/{teamId}/members")]
+        public async Task<IActionResult> GetTeamMembers(Guid teamId)
         {
-            try
+            var query = new GetTeamMembersQuery
             {
-                var query = new GetTeamMembersQuery
-                {
-                    RequestingUserId = GetCurrentUserId(),
-                    TeamId           = teamId
-                };
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+                RequestingUserId = GetCurrentUserId(),
+                TeamId           = teamId
+            };
+            return Ok(await _mediator.Send(query));
         }
 
-        /// <summary>Owner or TeamLeader: get all tasks assigned to a team.</summary>
         [Authorize(Roles = "Owner,Engineer")]
-        [HttpGet("{teamId}/tasks")]
-        public async Task<IActionResult> GetTeamTasks(int teamId)
+        [HttpGet("api/teams/{teamId}/tasks")]
+        public async Task<IActionResult> GetTeamTasks(Guid teamId)
         {
-            try
+            var query = new GetTeamTasksQuery
             {
-                var query = new GetTeamTasksQuery
-                {
-                    RequestingUserId = GetCurrentUserId(),
-                    TeamId           = teamId
-                };
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+                RequestingUserId = GetCurrentUserId(),
+                TeamId           = teamId
+            };
+            return Ok(await _mediator.Send(query));
         }
 
         // ── Helpers ────────────────────────────────────────────────────────────────

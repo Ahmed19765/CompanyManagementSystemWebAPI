@@ -5,23 +5,26 @@ namespace CompanyManagementSystem.Application.Interfaces.Repositories
 {
     public interface ITeamRepository
     {
-        Task<Team?> GetByIdAsync(int id);
+        Task<Team?> GetByIdAsync(Guid id);
         Task AddAsync(Team team);
-        Task<bool> ExistsByNameInDepartmentAsync(int departmentId, string teamName);
+        Task<bool> ExistsByNameInDepartmentAsync(Guid departmentId, string teamName);
         Task SaveChangesAsync();
 
         // ── Query methods ──────────────────────────────────────────────────────────
 
         /// <summary>Returns all teams (with UserTeams + Leader) for a given department.</summary>
-        Task<IEnumerable<Team>> GetAllByDepartmentIdAsync(int departmentId);
+        Task<IEnumerable<Team>> GetAllByDepartmentIdAsync(Guid departmentId);
 
         /// <summary>Returns a team with its members (UserTeams → User) fully loaded.</summary>
-        Task<Team?> GetWithMembersAsync(int teamId);
+        Task<Team?> GetWithMembersAsync(Guid teamId);
 
         /// <summary>Returns all teams led by the given user.</summary>
         Task<IEnumerable<Team>> GetAllByLeaderIdAsync(Guid leaderId);
 
-        Task<int> CompanyIdFromTeamId(int TeamId);
+        Task<Guid> CompanyIdFromTeamId(Guid TeamId);
+
+        /// <summary>Deletes a team (nullifies Task.TeamId, deletes UserTeams, then removes the team).</summary>
+        Task DeleteAsync(Guid teamId);
 
         // ── Write methods ──────────────────────────────────────────────────────────
 
@@ -30,6 +33,6 @@ namespace CompanyManagementSystem.Application.Interfaces.Repositories
         ///   - Deletes all UserTeam rows for this user in those teams.
         ///   - If the user leads any of those teams, sets Team.LeaderId = null.
         /// </summary>
-        Task RemoveUserFromAllTeamsInCompanyAsync(int companyId, Guid userId);
+        Task RemoveUserFromAllTeamsInCompanyAsync(Guid companyId, Guid userId);
     }
 }

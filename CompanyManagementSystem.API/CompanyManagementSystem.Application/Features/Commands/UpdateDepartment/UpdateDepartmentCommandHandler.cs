@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.UpdateDepartment
 {
-    public class UpdateDepartmentCommandHandler : IRequestHandler<UpdateDepartmentCommand, UpdateDepartmentResponse>
+    public class UpdateDepartmentCommandHandler : IRequestHandler<UpdateDepartmentCommand, Response<UpdateDepartmentResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IDepartmentRepository _departmentRepository;
@@ -17,7 +18,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateDepartment
             _departmentRepository = departmentRepository;
         }
 
-        public async Task<UpdateDepartmentResponse> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
+        public async Task<Response<UpdateDepartmentResponse>> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
         {
             var owner = await _userRepository.GetByIdAsync(request.OwnerId);
             if (owner is null)
@@ -52,7 +53,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateDepartment
             }
 
             var departmentExists = await _departmentRepository.ExistsByNameInCompanyAsync(
-                department.CompanyId ?? 0,
+                department.CompanyId ?? Guid.Empty,
                 request.DepartmentName,
                 request.DepartmentId);
 
@@ -66,13 +67,15 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateDepartment
 
             await _departmentRepository.SaveChangesAsync();
 
-            return new UpdateDepartmentResponse
-            {
-                DepartmentId = department.DepartmentId,
-                DepartmentName = department.DepartmentName,
-                DepartmentDescription = department.DepartmentDescription,
-                Message = "Department updated successfully."
-            };
+            return Response<UpdateDepartmentResponse>.Ok(
+                new UpdateDepartmentResponse
+                {
+                    DepartmentId = department.DepartmentId,
+                    DepartmentName = department.DepartmentName,
+                    DepartmentDescription = department.DepartmentDescription,
+                    Message = "Department updated successfully."
+                },
+                "Department updated successfully.");
         }
     }
 }

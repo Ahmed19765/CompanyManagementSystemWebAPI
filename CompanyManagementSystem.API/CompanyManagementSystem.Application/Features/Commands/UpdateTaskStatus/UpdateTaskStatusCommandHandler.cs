@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Commands.UpdateTaskStatus
 {
     public class UpdateTaskStatusCommandHandler
-        : IRequestHandler<UpdateTaskStatusCommand, UpdateTaskStatusResponse>
+        : IRequestHandler<UpdateTaskStatusCommand, Response<UpdateTaskStatusResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ITaskRepository _taskRepository;
@@ -29,7 +30,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateTaskStatus
             _companyUserRepository = companyUserRepository;
         }
 
-        public async Task<UpdateTaskStatusResponse> Handle(
+        public async Task<Response<UpdateTaskStatusResponse>> Handle(
             UpdateTaskStatusCommand request,
             CancellationToken cancellationToken)
         {
@@ -54,8 +55,8 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateTaskStatus
                 throw new Exception("Access denied. This task is not assigned to you.");
 
             // ── 4. Resolve company and check membership ────────────────────────────
-            var companyId = task.Team?.Department?.CompanyId ?? 0;
-            if (companyId == 0)
+            var companyId = task.Team?.Department?.CompanyId ?? Guid.Empty;
+            if (companyId == Guid.Empty)
                 throw new Exception("Task's team or department is no longer linked to a company.");
 
             var membership = await _companyUserRepository.GetMembershipAsync(companyId, request.UserId);
@@ -78,13 +79,13 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateTaskStatus
             task.Status = request.NewStatus;
             await _taskRepository.SaveChangesAsync();
 
-            return new UpdateTaskStatusResponse
+            return Response<UpdateTaskStatusResponse>.Ok(new UpdateTaskStatusResponse
             {
                 TaskId    = task.TaskId,
                 TaskTitle = task.TaskTitle ?? string.Empty,
                 NewStatus = task.Status.ToString(),
                 Message   = $"Task status updated to '{task.Status}'."
-            };
+            }, "Task status updated successfully.");
         }
     }
 }

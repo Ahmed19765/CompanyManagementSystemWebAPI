@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Features.Commands.DeleteTask;
 using CompanyManagementSystem.Application.Features.Commands.Tasks;
 using CompanyManagementSystem.Application.Features.Commands.UpdateTaskStatus;
 using CompanyManagementSystem.Application.Features.Queries.GetMyAssignedTasks;
@@ -8,7 +9,6 @@ using System.Security.Claims;
 
 namespace CompanyManagementSystem.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class TaskController : ControllerBase
     {
@@ -22,46 +22,36 @@ namespace CompanyManagementSystem.API.Controllers
         // ── Commands ───────────────────────────────────────────────────────────────
 
         [Authorize(Roles = "Owner,Engineer")]
-        [HttpPost("createTask")]
+        [HttpPost("api/tasks")]
         public async Task<IActionResult> CreateTask([FromBody] AddTaskCommand command)
         {
-            try
-            {
-                command.CurrentUserId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.CurrentUserId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>
-        /// Engineer: update the status of a task assigned to them.
-        /// Member rank: can set Todo, InProgress, Pending.
-        /// Leader rank: can set any status including Done and Failed.
-        /// </summary>
+        [Authorize(Roles = "Owner,Engineer")]
+        [HttpDelete("api/tasks")]
+        public async Task<IActionResult> DeleteTask([FromBody] DeleteTaskCommand command)
+        {
+            command.CurrentUserId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
+        }
+
         [Authorize(Roles = "Engineer")]
-        [HttpPut("update-status")]
+        [HttpPut("api/engineer/tasks/status")]
         public async Task<IActionResult> UpdateTaskStatus([FromBody] UpdateTaskStatusCommand command)
         {
-            try
-            {
-                command.UserId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.UserId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
         // ── Queries ────────────────────────────────────────────────────────────────
 
-        /// <summary>Engineer (member): get all tasks assigned to me.</summary>
         [Authorize(Roles = "Engineer")]
-        [HttpGet("my-tasks")]
+        [HttpGet("api/engineer/tasks")]
         public async Task<IActionResult> GetMyTasks()
         {
-            try
-            {
-                var query = new GetMyAssignedTasksQuery { UserId = GetCurrentUserId() };
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            var query = new GetMyAssignedTasksQuery { UserId = GetCurrentUserId() };
+            return Ok(await _mediator.Send(query));
         }
 
         // ── Helpers ────────────────────────────────────────────────────────────────

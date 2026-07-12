@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.DeleteDepartment
 {
     public class DeleteDepartmentCommandHandler
-        : IRequestHandler<DeleteDepartmentCommand, DeleteDepartmentResponse>
+        : IRequestHandler<DeleteDepartmentCommand, Response<DeleteDepartmentResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IDepartmentRepository _departmentRepository;
@@ -17,7 +18,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteDepartment
             _departmentRepository = departmentRepository;
         }
 
-        public async Task<DeleteDepartmentResponse> Handle(
+        public async Task<Response<DeleteDepartmentResponse>> Handle(
             DeleteDepartmentCommand request,
             CancellationToken cancellationToken)
         {
@@ -54,11 +55,13 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteDepartment
                 ? $"Department deleted. {unlinkedCount} team(s) have been unlinked and need reassignment to a new department."
                 : "Department deleted successfully.";
 
-            return new DeleteDepartmentResponse
-            {
-                Message          = message,
-                UnlinkedTeamCount = unlinkedCount
-            };
+            return Response<DeleteDepartmentResponse>.Ok(
+                new DeleteDepartmentResponse
+                {
+                    Message          = message,
+                    UnlinkedTeamCount = unlinkedCount
+                },
+                "Department deleted successfully.");
         }
     }
 }

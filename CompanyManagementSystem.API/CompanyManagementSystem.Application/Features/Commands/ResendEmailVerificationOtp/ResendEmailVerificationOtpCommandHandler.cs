@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Application.Interfaces.Services.MemoryCache;
 using CompanyManagementSystem.Application.Interfaces.Services.RegistrationAndLogin;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CompanyManagementSystem.Application.Features.Commands.ResendEmailVerificationOtp
 {
-    public class ResendEmailVerificationOtpCommandHandler : IRequestHandler<ResendEmailVerificationOtpCommand, ResendEmailVerificationOtpResponse>
+    public class ResendEmailVerificationOtpCommandHandler : IRequestHandler<ResendEmailVerificationOtpCommand, Response<string>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IOtpGenerator _otpGenerator;
@@ -28,7 +29,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.ResendEmailVerif
             _logger = logger;
         }
 
-        public async Task<ResendEmailVerificationOtpResponse> Handle(ResendEmailVerificationOtpCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(ResendEmailVerificationOtpCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user is null)
@@ -38,10 +39,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.ResendEmailVerif
 
             if (user.EmailConfirmed)
             {
-                return new ResendEmailVerificationOtpResponse
-                {
-                    Message = "Email is already verified."
-                };
+                return Response<string>.Ok(null!, "Email is already verified.");
             }
 
             if (user.IsBanned)
@@ -66,10 +64,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.ResendEmailVerif
                 "Email verification OTP resent successfully to {Email}",
                 request.Email);
 
-            return new ResendEmailVerificationOtpResponse
-            {
-                Message = "Email verification OTP sent successfully."
-            };
+            return Response<string>.Ok(null!, "OTP resent successfully.");
         }
     }
 }

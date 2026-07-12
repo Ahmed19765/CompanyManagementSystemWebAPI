@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Queries.GetMyAssignedTasks
 {
     public class GetMyAssignedTasksQueryHandler
-        : IRequestHandler<GetMyAssignedTasksQuery, GetMyAssignedTasksResponse>
+        : IRequestHandler<GetMyAssignedTasksQuery, Response<IEnumerable<MyTaskDto>>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ITaskRepository _taskRepository;
@@ -17,7 +18,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetMyAssignedTask
             _taskRepository = taskRepository;
         }
 
-        public async Task<GetMyAssignedTasksResponse> Handle(
+        public async Task<Response<IEnumerable<MyTaskDto>>> Handle(
             GetMyAssignedTasksQuery request,
             CancellationToken cancellationToken)
         {
@@ -50,7 +51,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetMyAssignedTask
                 AttachmentUrl      = t.Details?.TaskAttachmentDocumentUrl
             });
 
-            return new GetMyAssignedTasksResponse { Tasks = dtos };
+            return Response<IEnumerable<MyTaskDto>>.Ok(dtos, "Tasks retrieved successfully.");
         }
     }
 }

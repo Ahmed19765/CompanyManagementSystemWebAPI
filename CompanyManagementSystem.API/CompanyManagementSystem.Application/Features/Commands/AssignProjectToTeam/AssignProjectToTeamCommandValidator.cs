@@ -7,10 +7,10 @@ namespace CompanyManagementSystem.Application.Features.Commands.AssignProjectToT
         public AssignProjectToTeamCommandValidator()
         {
             RuleFor(x => x.ProjectId)
-                .GreaterThan(0).WithMessage("Project id is required.");
+                .NotEmpty().WithMessage("Project id is required.");
 
             RuleFor(x => x.TeamId)
-                .GreaterThan(0).WithMessage("Team id is required.");
+                .NotEmpty().WithMessage("Team id is required.");
         }
     }
 }

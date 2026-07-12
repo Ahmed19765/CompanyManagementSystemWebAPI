@@ -2,9 +2,9 @@ namespace CompanyManagementSystem.Application.Features.Commands.AssignProjectToT
 {
     public class AssignProjectToTeamResponse
     {
-        public int ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public string ProjectTitle { get; set; } = null!;
-        public int TeamId { get; set; }
+        public Guid TeamId { get; set; }
         public string TeamName { get; set; } = null!;
         public string Message { get; set; } = null!;
     }

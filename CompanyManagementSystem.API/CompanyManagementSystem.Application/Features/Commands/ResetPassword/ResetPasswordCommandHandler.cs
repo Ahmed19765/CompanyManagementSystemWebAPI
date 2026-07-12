@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Application.Interfaces.Services.MemoryCache;
 using CompanyManagementSystem.Application.Interfaces.Services.RegistrationAndLogin;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.ResetPassword
 {
-    public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, ResetPasswordResponse>
+    public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, Response<string>>
     {
         private readonly IUserRepository _userRepository;
         // IPasswordHasher no longer used here — UpdatePasswordAsync goes through UserManager.
@@ -26,7 +27,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.ResetPassword
             _refreshTokenRepository = refreshTokenRepository;
         }
 
-        public async Task<ResetPasswordResponse> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(ResetPasswordCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user is null)
@@ -59,10 +60,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.ResetPassword
             await _refreshTokenRepository.DeleteAllUserRefreshTokens(user.Id);
             _memoryCache.Remove(request.Email, TypeOfValue.PasswordResetOtp);
 
-            return new ResetPasswordResponse
-            {
-                Message = "Password reset successfully."
-            };
+            return Response<string>.Ok(null!, "Password has been reset successfully.");
         }
     }
 }

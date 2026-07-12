@@ -2,7 +2,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetDepartmentTeam
 {
     public class GetDepartmentTeamsResponse
     {
-        public int DepartmentId { get; set; }
+        public Guid DepartmentId { get; set; }
         public string DepartmentName { get; set; } = null!;
         public string? DepartmentDescription { get; set; }
         public IEnumerable<TeamSummaryDto> Teams { get; set; } = new List<TeamSummaryDto>();
@@ -10,7 +10,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetDepartmentTeam
 
     public class TeamSummaryDto
     {
-        public int TeamId { get; set; }
+        public Guid TeamId { get; set; }
         public string TeamName { get; set; } = null!;
         public string? TeamDescription { get; set; }
         public string? LeaderUserName { get; set; }

@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Queries.GetCompanyAcceptedProjects
 {
     public class GetCompanyAcceptedProjectsQueryHandler
-        : IRequestHandler<GetCompanyAcceptedProjectsQuery, GetCompanyAcceptedProjectsResponse>
+        : IRequestHandler<GetCompanyAcceptedProjectsQuery, Response<GetCompanyAcceptedProjectsResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -21,7 +22,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetCompanyAccepte
             _projectRepository = projectRepository;
         }
 
-        public async Task<GetCompanyAcceptedProjectsResponse> Handle(
+        public async Task<Response<GetCompanyAcceptedProjectsResponse>> Handle(
             GetCompanyAcceptedProjectsQuery request,
             CancellationToken cancellationToken)
         {
@@ -71,12 +72,14 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetCompanyAccepte
                 };
             });
 
-            return new GetCompanyAcceptedProjectsResponse
+            var response = new GetCompanyAcceptedProjectsResponse
             {
                 CompanyId   = company.CompanyId,
                 CompanyName = company.CompanyName ?? string.Empty,
                 Projects    = dtos
             };
+
+            return Response<GetCompanyAcceptedProjectsResponse>.Ok(response, "Projects retrieved successfully.");
         }
     }
 }

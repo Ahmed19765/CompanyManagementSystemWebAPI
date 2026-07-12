@@ -14,13 +14,13 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<bool> IsAlreadyAssignedAsync(int projectId, int teamId)
+        public async Task<bool> IsAlreadyAssignedAsync(Guid projectId, Guid teamId)
         {
             return await _context.ProjectTeams
                 .AnyAsync(pt => pt.ProjectId == projectId && pt.TeamId == teamId);
         }
 
-        public async Task AssignAsync(int projectId, int teamId)
+        public async Task AssignAsync(Guid projectId, Guid teamId)
         {
             var projectTeam = new ProjectTeam
             {
@@ -32,7 +32,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             await _context.ProjectTeams.AddAsync(projectTeam);
         }
 
-        public async Task UnassignAsync(int projectId, int teamId)
+        public async Task UnassignAsync(Guid projectId, Guid teamId)
         {
             await _context.ProjectTeams
                 .Where(pt => pt.ProjectId == projectId && pt.TeamId == teamId)

@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Queries.GetTeamTasks
 {
     public class GetTeamTasksQueryHandler
-        : IRequestHandler<GetTeamTasksQuery, GetTeamTasksResponse>
+        : IRequestHandler<GetTeamTasksQuery, Response<GetTeamTasksResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ITeamRepository _teamRepository;
@@ -20,7 +21,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetTeamTasks
             _taskRepository = taskRepository;
         }
 
-        public async Task<GetTeamTasksResponse> Handle(
+        public async Task<Response<GetTeamTasksResponse>> Handle(
             GetTeamTasksQuery request,
             CancellationToken cancellationToken)
         {
@@ -59,12 +60,14 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetTeamTasks
                 AcceptanceCriteria  = t.Details?.AcceptanceCriteria
             });
 
-            return new GetTeamTasksResponse
-            {
-                TeamId   = team.TeamId,
-                TeamName = team.TeamName ?? string.Empty,
-                Tasks    = dtos
-            };
+            return Response<GetTeamTasksResponse>.Ok(
+                new GetTeamTasksResponse
+                {
+                    TeamId   = team.TeamId,
+                    TeamName = team.TeamName ?? string.Empty,
+                    Tasks    = dtos
+                },
+                "Tasks retrieved successfully.");
         }
     }
 }

@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Commands.UnassignProjectFromTeam
 {
     public class UnassignProjectFromTeamCommandHandler
-        : IRequestHandler<UnassignProjectFromTeamCommand, UnassignProjectFromTeamResponse>
+        : IRequestHandler<UnassignProjectFromTeamCommand, Response<string>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ITeamRepository _teamRepository;
@@ -21,7 +22,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UnassignProjectF
             _projectTeamRepository = projectTeamRepository;
         }
 
-        public async Task<UnassignProjectFromTeamResponse> Handle(
+        public async Task<Response<string>> Handle(
             UnassignProjectFromTeamCommand request,
             CancellationToken cancellationToken)
         {
@@ -61,10 +62,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UnassignProjectF
             // ── 4. Remove the assignment ───────────────────────────────────────────
             await _projectTeamRepository.UnassignAsync(request.ProjectId, request.TeamId);
 
-            return new UnassignProjectFromTeamResponse
-            {
-                Message = "Project successfully unassigned from the team."
-            };
+            return Response<string>.Ok(null!, "Project unassigned from team successfully.");
         }
     }
 }

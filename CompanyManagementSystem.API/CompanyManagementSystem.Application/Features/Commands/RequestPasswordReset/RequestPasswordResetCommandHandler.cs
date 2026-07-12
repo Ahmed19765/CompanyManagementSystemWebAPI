@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Application.Interfaces.Services.MemoryCache;
 using CompanyManagementSystem.Application.Interfaces.Services.RegistrationAndLogin;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CompanyManagementSystem.Application.Features.Commands.RequestPasswordReset
 {
-    public class RequestPasswordResetCommandHandler : IRequestHandler<RequestPasswordResetCommand, RequestPasswordResetResponse>
+    public class RequestPasswordResetCommandHandler : IRequestHandler<RequestPasswordResetCommand, Response<string>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IOtpGenerator _otpGenerator;
@@ -28,15 +29,12 @@ namespace CompanyManagementSystem.Application.Features.Commands.RequestPasswordR
             _logger = logger;
         }
 
-        public async Task<RequestPasswordResetResponse> Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user is null)
             {
-                return new RequestPasswordResetResponse
-                {
-                    Message = "If this email exists, a password reset OTP has been sent."
-                };
+                return Response<string>.Ok(null!, "If the email exists, a reset OTP has been sent.");
             }
 
             if (user.IsBanned)
@@ -66,10 +64,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.RequestPasswordR
                 "Password reset OTP sent successfully to {Email}",
                 request.Email);
 
-            return new RequestPasswordResetResponse
-            {
-                Message = "If this email exists, a password reset OTP has been sent."
-            };
+            return Response<string>.Ok(null!, "If the email exists, a reset OTP has been sent.");
         }
     }
 }

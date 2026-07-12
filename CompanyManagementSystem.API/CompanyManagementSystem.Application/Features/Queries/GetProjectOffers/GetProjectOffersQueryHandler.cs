@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Queries.GetProjectOffers
 {
     public class GetProjectOffersQueryHandler
-        : IRequestHandler<GetProjectOffersQuery, GetProjectOffersResponse>
+        : IRequestHandler<GetProjectOffersQuery, Response<GetProjectOffersResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
@@ -20,7 +21,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetProjectOffers
             _companyOffersRepository = companyOffersRepository;
         }
 
-        public async Task<GetProjectOffersResponse> Handle(
+        public async Task<Response<GetProjectOffersResponse>> Handle(
             GetProjectOffersQuery request,
             CancellationToken cancellationToken)
         {
@@ -54,12 +55,12 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetProjectOffers
                 Status               = co.Status.ToString()
             });
 
-            return new GetProjectOffersResponse
+            return Response<GetProjectOffersResponse>.Ok(new GetProjectOffersResponse
             {
                 ProjectId    = project.ProjectId,
                 ProjectTitle = project.ProjectTitle ?? string.Empty,
                 Offers       = dtos
-            };
+            }, "Offers retrieved successfully.");
         }
     }
 }

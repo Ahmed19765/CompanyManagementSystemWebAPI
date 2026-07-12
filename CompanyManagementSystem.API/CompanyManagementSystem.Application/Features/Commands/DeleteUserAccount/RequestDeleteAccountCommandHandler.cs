@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Application.Interfaces.Services.MemoryCache;
 using CompanyManagementSystem.Application.Interfaces.Services.RegistrationAndLogin;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CompanyManagementSystem.Application.Features.Commands.DeleteUserAccount
 {
-    public class RequestDeleteAccountCommandHandler : IRequestHandler<RequestDeleteAccountCommand, RequestDeleteAccountResponse>
+    public class RequestDeleteAccountCommandHandler : IRequestHandler<RequestDeleteAccountCommand, Response<string>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IOtpGenerator _otpGenerator;
@@ -31,7 +32,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteUserAccoun
             _logger = logger;
         }
 
-        public async Task<RequestDeleteAccountResponse> Handle(RequestDeleteAccountCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(RequestDeleteAccountCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId);
             if (user is null)
@@ -61,10 +62,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteUserAccoun
                 "Account deletion OTP sent successfully to {Email}",
                 user.Email);
 
-            return new RequestDeleteAccountResponse
-            {
-                Message = "Account deletion OTP sent successfully to your registered email."
-            };
+            return Response<string>.Ok(null!, "Delete account OTP sent.");
         }
     }
 }

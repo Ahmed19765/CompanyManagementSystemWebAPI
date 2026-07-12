@@ -1,0 +1,48 @@
+### ─────────────────────────────────────────────────
+### Paste your Owner JWT token here after login
+### ─────────────────────────────────────────────────
+@baseUrl = https://localhost:7001
+@contentType = application/json
+@ownerToken = PASTE_OWNER_ACCESS_TOKEN_HERE
+@departmentId = PASTE_DEPARTMENT_GUID_HERE
+
+### ─────────────────────────────────────────────────
+### 1. Create Department (Owner)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/department
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "companyName": "Tech Solutions Co.",
+  "departmentName": "Engineering"
+}
+
+### ─────────────────────────────────────────────────
+### 2. Update Department (Owner)
+### ─────────────────────────────────────────────────
+PUT {{baseUrl}}/api/department/{{departmentId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "departmentName": "Software Engineering",
+  "departmentDescription": "Handles all software development tasks."
+}
+
+### ─────────────────────────────────────────────────
+### 3. Get Department Teams (Owner)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/department/{{departmentId}}/teams
+Authorization: Bearer {{ownerToken}}
+
+### ─────────────────────────────────────────────────
+### 4. Delete Department — teams become unlinked (Owner)
+### ─────────────────────────────────────────────────
+DELETE {{baseUrl}}/api/department/owner/delete-department
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "departmentId": "{{departmentId}}"
+}

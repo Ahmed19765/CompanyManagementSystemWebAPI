@@ -1,16 +1,17 @@
+using CompanyManagementSystem.Application.Common;
 using MediatR;
 using System.Text.Json.Serialization;
 
 namespace CompanyManagementSystem.Application.Features.Commands.AssignProjectToTeam
 {
-    public class AssignProjectToTeamCommand : IRequest<AssignProjectToTeamResponse>
+    public class AssignProjectToTeamCommand : IRequest<Response<AssignProjectToTeamResponse>>
     {
         // Injected from JWT
         [JsonIgnore]
         public Guid OwnerId { get; set; }
 
         // Sent from the client in the JSON body
-        public int ProjectId { get; set; }
-        public int TeamId { get; set; }
+        public Guid ProjectId { get; set; }
+        public Guid TeamId { get; set; }
     }
 }

@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
 using System;
 
 namespace CompanyManagementSystem.Application.Features.Commands.Register
 {
-    public class RegisterCommand : IRequest<RegisterResponse>
+    public class RegisterCommand : IRequest<Response<RegisterResponse>>
     {
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;

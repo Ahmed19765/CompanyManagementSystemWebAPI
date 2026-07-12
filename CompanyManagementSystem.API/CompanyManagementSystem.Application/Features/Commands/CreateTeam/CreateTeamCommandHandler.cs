@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Entities;
 using CompanyManagementSystem.Domain.Enumerations;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.CreateTeam
 {
-    public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, CreateTeamResponse>
+    public class CreateTeamCommandHandler : IRequestHandler<CreateTeamCommand, Response<CreateTeamResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IDepartmentRepository _departmentRepository;
@@ -24,7 +25,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateTeam
             _companyUserRepository = companyUserRepository;
         }
 
-        public async Task<CreateTeamResponse> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
+        public async Task<Response<CreateTeamResponse>> Handle(CreateTeamCommand request, CancellationToken cancellationToken)
         {
             var owner = await _userRepository.GetByIdAsync(request.OwnerId);
             if (owner is null)
@@ -82,7 +83,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateTeam
             }
 
             var leaderMembership = await _companyUserRepository.GetMembershipAsync(
-                department.CompanyId ?? 0,
+                department.CompanyId ?? Guid.Empty,
                 leader.Id);
 
             if (leaderMembership is null)
@@ -104,20 +105,17 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateTeam
                 throw new Exception("Team already exists in this department.");
             }
 
-            var LeaderId = await _userRepository.GetUserIdFromUserName(request.LeaderUserName);
-
-
             var team = new Team
             {
                 DepartmentId = request.DepartmentId,
-                LeaderId = LeaderId,
+                LeaderId = leader.Id,
                 TeamName = request.TeamName,
                 TeamDescription = request.TeamDescription,
                 UserTeams =
                 {
                     new UserTeam
                     {
-                        UserId = LeaderId,
+                        UserId = leader.Id,
                         TeamRole = "Team Leader"
                     }
                 }
@@ -126,11 +124,13 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateTeam
             await _teamRepository.AddAsync(team);
             await _teamRepository.SaveChangesAsync();
 
-            return new CreateTeamResponse
-            {
-                TeamId = team.TeamId,
-                Message = "Team created successfully."
-            };
+            return Response<CreateTeamResponse>.Ok(
+                new CreateTeamResponse
+                {
+                    TeamId = team.TeamId,
+                    Message = "Team created successfully."
+                },
+                "Team created successfully.");
         }
     }
 }

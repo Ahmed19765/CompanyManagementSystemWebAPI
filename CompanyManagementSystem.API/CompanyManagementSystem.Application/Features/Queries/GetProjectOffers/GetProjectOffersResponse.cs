@@ -2,14 +2,14 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetProjectOffers
 {
     public class GetProjectOffersResponse
     {
-        public int ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public string ProjectTitle { get; set; } = null!;
         public IEnumerable<OfferDto> Offers { get; set; } = new List<OfferDto>();
     }
 
     public class OfferDto
     {
-        public int CompanyId { get; set; }
+        public Guid CompanyId { get; set; }
         public string CompanyName { get; set; } = null!;
         public string? CompanyDescription { get; set; }
         public decimal OfferedBudget { get; set; }

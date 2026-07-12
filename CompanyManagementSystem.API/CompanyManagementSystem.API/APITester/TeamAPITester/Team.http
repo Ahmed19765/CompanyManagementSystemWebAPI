@@ -1,0 +1,34 @@
+### ─────────────────────────────────────────────────
+### Paste tokens here after login
+### ─────────────────────────────────────────────────
+@baseUrl = https://localhost:7001
+@contentType = application/json
+@ownerToken = PASTE_OWNER_ACCESS_TOKEN_HERE
+@engineerToken = PASTE_ENGINEER_ACCESS_TOKEN_HERE
+@teamId = PASTE_TEAM_GUID_HERE
+
+### ─────────────────────────────────────────────────
+### 1. Create Team (Owner)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/team/createTeam
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "departmentId": "PASTE_DEPARTMENT_GUID_HERE",
+  "leaderUserName": "mohamed_eng",
+  "teamName": "Backend Team",
+  "teamDescription": "Handles API and database work."
+}
+
+### ─────────────────────────────────────────────────
+### 2. Get Team Members (Owner or Team Leader)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/team/{{teamId}}/members
+Authorization: Bearer {{ownerToken}}
+
+### ─────────────────────────────────────────────────
+### 3. Get Team Tasks (Owner or Team Leader)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/team/{{teamId}}/tasks
+Authorization: Bearer {{ownerToken}}

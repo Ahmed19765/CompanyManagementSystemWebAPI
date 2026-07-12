@@ -2,7 +2,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateProject
 {
     public class UpdateProjectResponse
     {
-        public int ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public string ProjectTitle { get; set; } = null!;
         public string? ProjectDescription { get; set; }
         public string? ProjectDocumentsUrl { get; set; }

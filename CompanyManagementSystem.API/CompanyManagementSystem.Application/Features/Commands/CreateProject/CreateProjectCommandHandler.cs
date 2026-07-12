@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Entities;
 using CompanyManagementSystem.Domain.Enumerations;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.CreateProject
 {
-    public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand, CreateProjectResponse>
+    public class CreateProjectCommandHandler : IRequestHandler<CreateProjectCommand, Response<CreateProjectResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
@@ -18,7 +19,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateProject
             _projectRepository = projectRepository;
         }
 
-        public async Task<CreateProjectResponse> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
+        public async Task<Response<CreateProjectResponse>> Handle(CreateProjectCommand request, CancellationToken cancellationToken)
         {
             var customer = await _userRepository.GetByIdAsync(request.CustomerId);
             if (customer is null)
@@ -54,11 +55,11 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateProject
             await _projectRepository.AddAsync(project);
             await _projectRepository.SaveChangesAsync();
 
-            return new CreateProjectResponse
+            return Response<CreateProjectResponse>.Ok(new CreateProjectResponse
             {
                 ProjectId = project.ProjectId,
                 Message = "Project created successfully."
-            };
+            }, "Project created successfully.");
         }
     }
 }

@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Queries.GetOwnerCompanies
 {
     public class GetOwnerCompaniesQueryHandler
-        : IRequestHandler<GetOwnerCompaniesQuery, GetOwnerCompaniesResponse>
+        : IRequestHandler<GetOwnerCompaniesQuery, Response<IEnumerable<CompanyDto>>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -17,7 +18,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetOwnerCompanies
             _companyRepository = companyRepository;
         }
 
-        public async Task<GetOwnerCompaniesResponse> Handle(
+        public async Task<Response<IEnumerable<CompanyDto>>> Handle(
             GetOwnerCompaniesQuery request,
             CancellationToken cancellationToken)
         {
@@ -44,7 +45,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetOwnerCompanies
                 DepartmentCount = c.Departments.Count
             });
 
-            return new GetOwnerCompaniesResponse { Companies = dtos };
+            return Response<IEnumerable<CompanyDto>>.Ok(dtos, "Companies retrieved successfully.");
         }
     }
 }

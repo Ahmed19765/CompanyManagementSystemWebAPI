@@ -14,7 +14,6 @@ using System.Security.Claims;
 
 namespace CompanyManagementSystem.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
     public class ProjectController : ControllerBase
     {
@@ -28,127 +27,78 @@ namespace CompanyManagementSystem.API.Controllers
         // ── Commands ───────────────────────────────────────────────────────────────
 
         [Authorize(Roles = "Customer")]
-        [HttpPost("customer/createProject")]
+        [HttpPost("api/customer/projects")]
         public async Task<IActionResult> CreateProject([FromBody] CreateProjectCommand command)
         {
-            try
-            {
-                command.CustomerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.CustomerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>Owner: assign one of their company's projects to a team in the same company.</summary>
         [Authorize(Roles = "Owner")]
-        [HttpPost("owner/assign-to-team")]
+        [HttpPost("api/owner/projects/assign-to-team")]
         public async Task<IActionResult> AssignProjectToTeam([FromBody] AssignProjectToTeamCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>Owner: remove a project assignment from a team (undo a wrong assignment).</summary>
         [Authorize(Roles = "Owner")]
-        [HttpDelete("owner/unassign-from-team")]
+        [HttpDelete("api/owner/projects/unassign-from-team")]
         public async Task<IActionResult> UnassignProjectFromTeam([FromBody] UnassignProjectFromTeamCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>
-        /// Customer: update their project info.
-        /// Allowed only within 3 days of creation and only if no offer has been accepted.
-        /// </summary>
         [Authorize(Roles = "Customer")]
-        [HttpPut("customer/update-project")]
+        [HttpPut("api/customer/projects")]
         public async Task<IActionResult> UpdateProject([FromBody] UpdateProjectCommand command)
         {
-            try
-            {
-                command.CustomerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.CustomerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>
-        /// Customer: delete their project.
-        /// Allowed only within 3 days of creation and only if no offer has been accepted.
-        /// </summary>
         [Authorize(Roles = "Customer")]
-        [HttpDelete("customer/delete-project")]
+        [HttpDelete("api/customer/projects")]
         public async Task<IActionResult> DeleteProject([FromBody] DeleteProjectCommand command)
         {
-            try
-            {
-                command.CustomerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.CustomerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
         // ── Queries ────────────────────────────────────────────────────────────────
 
-        /// <summary>Customer: get all their projects with task progress and offer details.</summary>
         [Authorize(Roles = "Customer")]
-        [HttpGet("customer/my-projects")]
+        [HttpGet("api/customer/projects")]
         public async Task<IActionResult> GetMyProjects()
         {
-            try
-            {
-                var query = new GetCustomerProjectsQuery { CustomerId = GetCurrentUserId() };
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            var query = new GetCustomerProjectsQuery { CustomerId = GetCurrentUserId() };
+            return Ok(await _mediator.Send(query));
         }
 
-        /// <summary>Customer: see all offers submitted by companies on one of their projects.</summary>
         [Authorize(Roles = "Customer")]
-        [HttpGet("customer/project-offers")]
+        [HttpGet("api/customer/projects/offers")]
         public async Task<IActionResult> GetProjectOffers([FromBody] GetProjectOffersQuery query)
         {
-            try
-            {
-                query.CustomerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            query.CustomerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(query));
         }
 
-        /// <summary>Customer: accept one company's offer — all other offers on the project are rejected.</summary>
         [Authorize(Roles = "Customer")]
-        [HttpPost("customer/accept-offer")]
+        [HttpPost("api/customer/projects/accept-offer")]
         public async Task<IActionResult> AcceptOffer([FromBody] AcceptProjectOfferCommand command)
         {
-            try
-            {
-                command.CustomerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.CustomerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
         [Authorize(Roles = "Owner")]
-        [HttpGet("owner/customers-projects")]
+        [HttpGet("api/owner/projects")]
         public async Task<IActionResult> GetAllProjects()
         {
-            try
-            {
-                var query = new GetProjectsQuery();
-                query.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            var query = new GetProjectsQuery();
+            query.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(query));
         }
         // ── Helpers ────────────────────────────────────────────────────────────────
 

@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.UpdateProject
 {
     public class UpdateProjectCommandHandler
-        : IRequestHandler<UpdateProjectCommand, UpdateProjectResponse>
+        : IRequestHandler<UpdateProjectCommand, Response<UpdateProjectResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
@@ -20,7 +21,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateProject
             _projectRepository = projectRepository;
         }
 
-        public async Task<UpdateProjectResponse> Handle(
+        public async Task<Response<UpdateProjectResponse>> Handle(
             UpdateProjectCommand request,
             CancellationToken cancellationToken)
         {
@@ -66,7 +67,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateProject
 
             await _projectRepository.UpdateAsync(project);
 
-            return new UpdateProjectResponse
+            return Response<UpdateProjectResponse>.Ok(new UpdateProjectResponse
             {
                 ProjectId            = project.ProjectId,
                 ProjectTitle         = project.ProjectTitle ?? string.Empty,
@@ -74,7 +75,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateProject
                 ProjectDocumentsUrl  = project.ProjectDocumentsUrl,
                 ProjectOfferedBudget = project.ProjectOfferedBudget,
                 Message              = "Project updated successfully."
-            };
+            }, "Project updated successfully.");
         }
     }
 }

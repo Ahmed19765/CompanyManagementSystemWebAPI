@@ -1,4 +1,5 @@
-﻿using CompanyManagementSystem.Domain.Entities;
+﻿using CompanyManagementSystem.Application.Common;
+using CompanyManagementSystem.Domain.Entities;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace CompanyManagementSystem.Application.Features.Commands.CreateCompany
 {
-    public class AddCompanyCommand : IRequest<CompanyCreationResponse>
+    public class AddCompanyCommand : IRequest<Response<string>>
     {
         [JsonIgnore]
         public Guid OwnerId { get; set; }

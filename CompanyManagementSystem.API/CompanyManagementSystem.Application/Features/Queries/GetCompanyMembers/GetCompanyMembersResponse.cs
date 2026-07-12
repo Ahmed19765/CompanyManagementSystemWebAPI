@@ -2,7 +2,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetCompanyMembers
 {
     public class GetCompanyMembersResponse
     {
-        public int CompanyId { get; set; }
+        public Guid CompanyId { get; set; }
         public IEnumerable<CompanyMemberDto> Members { get; set; } = new List<CompanyMemberDto>();
     }
 

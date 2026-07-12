@@ -6,10 +6,10 @@ namespace CompanyManagementSystem.Domain.Entities
     public class ProjectTeam
     {
         // Composite Primary Key (configured in DbContext)
-        public int ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public Project Project { get; set; } = null!;
 
-        public int TeamId { get; set; }
+        public Guid TeamId { get; set; }
         public Team Team { get; set; } = null!;
 
         public DateTime AssignedAt { get; set; } = DateTime.UtcNow;

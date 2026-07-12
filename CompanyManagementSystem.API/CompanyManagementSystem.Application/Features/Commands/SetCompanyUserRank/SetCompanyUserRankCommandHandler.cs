@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Entities;
 using CompanyManagementSystem.Domain.Enumerations;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.SetCompanyUserRank
 {
-    public class SetCompanyUserRankCommandHandler : IRequestHandler<SetCompanyUserRankCommand, SetCompanyUserRankResponse>
+    public class SetCompanyUserRankCommandHandler : IRequestHandler<SetCompanyUserRankCommand, Response<SetCompanyUserRankResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -21,7 +22,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.SetCompanyUserRa
             _companyUserRepository = companyUserRepository;
         }
 
-        public async Task<SetCompanyUserRankResponse> Handle(SetCompanyUserRankCommand request, CancellationToken cancellationToken)
+        public async Task<Response<SetCompanyUserRankResponse>> Handle(SetCompanyUserRankCommand request, CancellationToken cancellationToken)
         {
             var owner = await _userRepository.GetByIdAsync(request.OwnerId);
             if (owner is null)
@@ -96,13 +97,15 @@ namespace CompanyManagementSystem.Application.Features.Commands.SetCompanyUserRa
 
             await _companyUserRepository.SaveChangesAsync();
 
-            return new SetCompanyUserRankResponse
+            var response = new SetCompanyUserRankResponse
             {
                 CompanyId = request.CompanyId,
                 UserId = request.UserId,
                 Rank = request.Rank,
                 Message = "Company member rank updated successfully."
             };
+
+            return Response<SetCompanyUserRankResponse>.Ok(response, "Rank updated successfully.");
         }
     }
 }

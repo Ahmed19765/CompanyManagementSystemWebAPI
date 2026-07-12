@@ -1,0 +1,111 @@
+### ─────────────────────────────────────────────────
+### Paste your Owner JWT token here after login
+### ─────────────────────────────────────────────────
+@baseUrl = https://localhost:7001
+@contentType = application/json
+@ownerToken = PASTE_OWNER_ACCESS_TOKEN_HERE
+@companyId = PASTE_COMPANY_GUID_HERE
+
+### ─────────────────────────────────────────────────
+### 1. Create Company (Owner)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/company/owner/create-company
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "companyName": "Tech Solutions Co.",
+  "companyDescription": "A software development company."
+}
+
+### ─────────────────────────────────────────────────
+### 2. Get My Companies (Owner)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/company/owner/my-companies
+Authorization: Bearer {{ownerToken}}
+
+### ─────────────────────────────────────────────────
+### 3. Add Member to Company (Owner)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/company/owner/add-members
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "companyId": "{{companyId}}",
+  "userName": "mohamed_eng"
+}
+
+### ─────────────────────────────────────────────────
+### 4. Get Company Members (Owner)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/company/owner/{{companyId}}/members
+Authorization: Bearer {{ownerToken}}
+
+### ─────────────────────────────────────────────────
+### 5. Set Company Member Rank (Owner)
+### ─────────────────────────────────────────────────
+PUT {{baseUrl}}/api/company/owner/company-members/rank-up
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "companyId": "{{companyId}}",
+  "userId": "PASTE_ENGINEER_USER_GUID_HERE",
+  "rank": "Leader"
+}
+
+### ─────────────────────────────────────────────────
+### 6. Get Company Departments (Owner)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/company/owner/{{companyId}}/departments
+Authorization: Bearer {{ownerToken}}
+
+### ─────────────────────────────────────────────────
+### 7. Get Accepted Projects with Progress (Owner)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/company/owner/accepted-projects
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "companyId": "{{companyId}}"
+}
+
+### ─────────────────────────────────────────────────
+### 8. Add Offer on a Project (Owner)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/company/owner/add-offer
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "companyId": "{{companyId}}",
+  "projectId": "PASTE_PROJECT_GUID_HERE",
+  "offeredBudget": 50000.00,
+  "startDate": "2026-08-01T00:00:00Z",
+  "deliveryExpectedDate": "2026-12-01T00:00:00Z"
+}
+
+### ─────────────────────────────────────────────────
+### 9. Remove Company Member (Owner)
+### ─────────────────────────────────────────────────
+DELETE {{baseUrl}}/api/company/owner/remove-member
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "companyId": "{{companyId}}",
+  "targetUserId": "PASTE_USER_GUID_HERE"
+}
+
+### ─────────────────────────────────────────────────
+### 10. Delete Company — soft delete (Owner)
+### ─────────────────────────────────────────────────
+DELETE {{baseUrl}}/api/company/owner/delete-company
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "companyId": "{{companyId}}"
+}

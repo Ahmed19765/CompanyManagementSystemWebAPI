@@ -14,7 +14,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Project?> GetByIdAsync(int id)
+        public async Task<Project?> GetByIdAsync(Guid id)
         {
             return await _context.Projects
                 .FirstOrDefaultAsync(p => p.ProjectId == id);
@@ -24,10 +24,12 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
         {
             return await _context.Projects
                 .Where(p => p.CustomerId == customerId)
+                .Include(p => p.CompanyOffers)
+                    .ThenInclude(co => co.Company)
                 .ToListAsync();
         }
 
-        public async Task<Project?> GetWithDetailsAsync(int projectId)
+        public async Task<Project?> GetWithDetailsAsync(Guid projectId)
         {
             return await _context.Projects
                 .Include(p => p.Tasks)
@@ -41,10 +43,17 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
 
         public async Task<IEnumerable<Project>> GetAllProjectsAsync()
         {
-            return _context.Projects.AsQueryable();
+            return await _context.Projects.ToListAsync();
         }
 
-        public async Task<IEnumerable<Project>> GetAcceptedProjectsByCompanyIdAsync(int companyId)
+        public async Task<IEnumerable<Project>> GetAllPendingProjectsAsync()
+        {
+            return await _context.Projects
+                .Where(p => p.ProjectStatus == Domain.Enumerations.ProjectState.Pending)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Project>> GetAcceptedProjectsByCompanyIdAsync(Guid companyId)
         {
             // Join through CompanyOffers — get all projects where this company's offer is Accepted
             return await _context.Projects
@@ -58,7 +67,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<bool> HasAcceptedOfferAsync(int projectId)
+        public async Task<bool> HasAcceptedOfferAsync(Guid projectId)
         {
             return await _context.CompanyOffers
                 .AnyAsync(co => co.ProjectId == projectId
@@ -71,7 +80,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(int projectId)
+        public async Task DeleteAsync(Guid projectId)
         {
             await _context.Projects
                 .Where(p => p.ProjectId == projectId)

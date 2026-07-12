@@ -1,13 +1,13 @@
-﻿using CompanyManagementSystem.Domain.Enumerations;
+using CompanyManagementSystem.Domain.Enumerations;
 
 namespace CompanyManagementSystem.Domain.Entities
 {
     public class CompanyOffers
     {
-        public int CompanyId { get; set; }
+        public Guid CompanyId { get; set; }
         public Company? Company { get; set; }
 
-        public int ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public Project? Project { get; set; }
 
         public decimal OfferedBudget { get; set; } // The budget offered by the company (Owner) for the project

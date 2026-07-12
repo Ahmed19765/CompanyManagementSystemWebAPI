@@ -9,7 +9,7 @@ using System.Security.Claims;
 
 namespace CompanyManagementSystem.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/owner/departments")]
     [ApiController]
     public class DepartmentController : ControllerBase
     {
@@ -26,57 +26,39 @@ namespace CompanyManagementSystem.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateDepartment([FromBody] CreateDepartmentCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
         [Authorize(Roles = "Owner")]
         [HttpPut("{departmentId}")]
-        public async Task<IActionResult> UpdateDepartment(int departmentId, [FromBody] UpdateDepartmentCommand command)
+        public async Task<IActionResult> UpdateDepartment(Guid departmentId, [FromBody] UpdateDepartmentCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                command.DepartmentId = departmentId;
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            command.DepartmentId = departmentId;
+            return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>Owner: delete a department — teams are unlinked (DepartmentId = null) not deleted.</summary>
         [Authorize(Roles = "Owner")]
-        [HttpDelete("owner/delete-department")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteDepartment([FromBody] DeleteDepartmentCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
         // ── Queries ────────────────────────────────────────────────────────────────
 
-        /// <summary>Owner: get all teams inside a department they own.</summary>
         [Authorize(Roles = "Owner")]
         [HttpGet("{departmentId}/teams")]
-        public async Task<IActionResult> GetDepartmentTeams(int departmentId)
+        public async Task<IActionResult> GetDepartmentTeams(Guid departmentId)
         {
-            try
+            var query = new GetDepartmentTeamsQuery
             {
-                var query = new GetDepartmentTeamsQuery
-                {
-                    RequestingUserId = GetCurrentUserId(),
-                    DepartmentId     = departmentId
-                };
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+                RequestingUserId = GetCurrentUserId(),
+                DepartmentId     = departmentId
+            };
+            return Ok(await _mediator.Send(query));
         }
 
         // ── Helpers ────────────────────────────────────────────────────────────────

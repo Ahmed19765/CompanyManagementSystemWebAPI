@@ -16,7 +16,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Team?> GetByIdAsync(int id)
+        public async Task<Team?> GetByIdAsync(Guid id)
         {
             return await _context.Teams
                 .Include(t => t.Department)
@@ -30,13 +30,13 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             await _context.Teams.AddAsync(team);
         }
 
-        public async Task<bool> ExistsByNameInDepartmentAsync(int departmentId, string teamName)
+        public async Task<bool> ExistsByNameInDepartmentAsync(Guid departmentId, string teamName)
         {
             return await _context.Teams
                 .AnyAsync(t => t.DepartmentId == departmentId && t.TeamName == teamName);
         }
 
-        public async Task<IEnumerable<Team>> GetAllByDepartmentIdAsync(int departmentId)
+        public async Task<IEnumerable<Team>> GetAllByDepartmentIdAsync(Guid departmentId)
         {
             return await _context.Teams
                 .Where(t => t.DepartmentId == departmentId)
@@ -46,7 +46,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<Team?> GetWithMembersAsync(int teamId)
+        public async Task<Team?> GetWithMembersAsync(Guid teamId)
         {
             return await _context.Teams
                 .Include(t => t.Leader)
@@ -65,7 +65,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<int> CompanyIdFromTeamId(int TeamId)
+        public async Task<Guid> CompanyIdFromTeamId(Guid TeamId)
         {
             var team = await _context.Teams
                 .Include(t => t.Department)
@@ -74,10 +74,25 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             {
                 throw new Exception("Team not found.");
             }
-            return team.Department?.CompanyId ?? 0;
+            return team.Department?.CompanyId ?? Guid.Empty;
         }
 
-        public async Task RemoveUserFromAllTeamsInCompanyAsync(int companyId, Guid userId)
+        public async Task DeleteAsync(Guid teamId)
+        {
+            await _context.Tasks
+                .Where(t => t.TeamId == teamId)
+                .ExecuteUpdateAsync(s => s.SetProperty(t => t.TeamId, (Guid?)null));
+
+            await _context.UserTeams
+                .Where(ut => ut.TeamId == teamId)
+                .ExecuteDeleteAsync();
+
+            await _context.Teams
+                .Where(t => t.TeamId == teamId)
+                .ExecuteDeleteAsync();
+        }
+
+        public async Task RemoveUserFromAllTeamsInCompanyAsync(Guid companyId, Guid userId)
         {
             // Get all team IDs that belong to this company
             var teamIdsInCompany = await _context.Teams

@@ -7,7 +7,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteDepartment
         public DeleteDepartmentCommandValidator()
         {
             RuleFor(x => x.DepartmentId)
-                .GreaterThan(0).WithMessage("Department id is required.");
+                .NotEmpty().WithMessage("Department id is required.");
         }
     }
 }

@@ -20,7 +20,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
             await _context.Tasks.AddAsync(task);
         }
 
-        public async Task<Tasks?> GetByIdAsync(int taskId)
+        public async Task<Tasks?> GetByIdAsync(Guid taskId)
         {
             return await _context.Tasks
                 .Include(t => t.Team)
@@ -31,7 +31,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .FirstOrDefaultAsync(t => t.TaskId == taskId);
         }
 
-        public async Task<IEnumerable<Tasks>> GetAllByTeamIdAsync(int teamId)
+        public async Task<IEnumerable<Tasks>> GetAllByTeamIdAsync(Guid teamId)
         {
             return await _context.Tasks
                 .Where(t => t.TeamId == teamId)
@@ -39,6 +39,43 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .Include(t => t.AssignedTo)
                 .Include(t => t.AssignedBy)
                 .ToListAsync();
+        }
+
+        public async Task DeleteAsync(Guid taskId)
+        {
+            await _context.Tasks
+                .Where(t => t.TaskId == taskId)
+                .ExecuteDeleteAsync();
+        }
+
+        public async Task<int> CountActiveTasksByUserIdAsync(Guid userId)
+        {
+            var activeStates = new[]
+            {
+                Domain.Enumerations.TaskState.Todo,
+                Domain.Enumerations.TaskState.InProgress,
+                Domain.Enumerations.TaskState.Pending
+            };
+
+            return await _context.Tasks
+                .CountAsync(t => t.AssignedToId == userId && activeStates.Contains(t.Status));
+        }
+
+        public async Task<int> CountActiveTasksForCompanyAsync(Guid companyId)
+        {
+            var activeStates = new[]
+            {
+                Domain.Enumerations.TaskState.Todo,
+                Domain.Enumerations.TaskState.InProgress,
+                Domain.Enumerations.TaskState.Pending
+            };
+
+            return await _context.Tasks
+                .Where(t => t.Team != null
+                         && t.Team.Department != null
+                         && t.Team.Department.CompanyId == companyId
+                         && activeStates.Contains(t.Status))
+                .CountAsync();
         }
 
         public async Task<IEnumerable<Tasks>> GetAllAssignedToUserAsync(Guid userId)
@@ -51,7 +88,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Tasks>> GetAllByProjectIdAsync(int projectId)
+        public async Task<IEnumerable<Tasks>> GetAllByProjectIdAsync(Guid projectId)
         {
             return await _context.Tasks
                 .Where(t => t.ProjectId == projectId)
@@ -76,7 +113,7 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .ExecuteUpdateAsync(s => s.SetProperty(t => t.AssignedToId, (Guid?)null));
         }
 
-        public async Task NullifyAllActiveTasksInCompanyAsync(int companyId)
+        public async Task NullifyAllActiveTasksInCompanyAsync(Guid companyId)
         {
             // Collect all team IDs that belong to this company's departments
             var teamIds = await _context.Teams

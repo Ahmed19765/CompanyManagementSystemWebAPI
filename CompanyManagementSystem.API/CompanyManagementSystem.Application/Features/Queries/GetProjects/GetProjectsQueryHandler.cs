@@ -1,4 +1,5 @@
-﻿using CompanyManagementSystem.Application.Features.Queries.GetCustomerProjects;
+﻿using CompanyManagementSystem.Application.Common;
+using CompanyManagementSystem.Application.Features.Queries.GetCustomerProjects;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using MediatR;
 using System;
@@ -8,7 +9,7 @@ using CompanyManagementSystem.Domain.Enumerations;
 
 namespace CompanyManagementSystem.Application.Features.Queries.GetProjects
 {
-    public class GetProjectsQueryHandler : IRequestHandler<GetProjectsQuery, GetProjectsResponse>
+    public class GetProjectsQueryHandler : IRequestHandler<GetProjectsQuery, Response<IEnumerable<ProjectsDto>>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
@@ -21,7 +22,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetProjects
             _projectRepository = projectRepository;
         }
 
-        public async Task<GetProjectsResponse> Handle(GetProjectsQuery request, CancellationToken cancellationToken)
+        public async Task<Response<IEnumerable<ProjectsDto>>> Handle(GetProjectsQuery request, CancellationToken cancellationToken)
         {
             
             var Owner = await _userRepository.GetByIdAsync(request.OwnerId);
@@ -34,9 +35,8 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetProjects
             if (!Owner.EmailConfirmed)
                 throw new Exception("Please verify your email.");
             
-            var projects = await _projectRepository.GetAllProjectsAsync();
-            var pendingProjects = projects.Where(p => p.ProjectStatus == ProjectState.Pending)
-                .Select(p => new ProjectsDto
+            var projects = await _projectRepository.GetAllPendingProjectsAsync();
+            var pendingProjects = projects.Select(p => new ProjectsDto
                 {
                     ProjectId = p.ProjectId,
                     ProjectTitle = p.ProjectTitle ?? string.Empty,
@@ -49,7 +49,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetProjects
                 .ToList();
 
 
-            return new GetProjectsResponse { Projects = pendingProjects };
+            return Response<IEnumerable<ProjectsDto>>.Ok(pendingProjects, "Projects retrieved successfully.");
         }
     }
 }

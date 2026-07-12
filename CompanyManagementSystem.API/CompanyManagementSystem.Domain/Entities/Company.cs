@@ -2,7 +2,7 @@ namespace CompanyManagementSystem.Domain.Entities
 {
     public class Company
     {
-        public int CompanyId { get; set; }
+        public Guid CompanyId { get; set; } = Guid.NewGuid();
         public string? CompanyName { get; set; }
         public string? CompanyDescription { get; set; }
         public string? JoinCode { get; set; } = Guid.NewGuid().ToString();

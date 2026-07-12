@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.DeleteProject
 {
     public class DeleteProjectCommandHandler
-        : IRequestHandler<DeleteProjectCommand, DeleteProjectResponse>
+        : IRequestHandler<DeleteProjectCommand, Response<string>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
@@ -19,7 +20,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteProject
             _projectRepository = projectRepository;
         }
 
-        public async Task<DeleteProjectResponse> Handle(
+        public async Task<Response<string>> Handle(
             DeleteProjectCommand request,
             CancellationToken cancellationToken)
         {
@@ -60,10 +61,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteProject
             // ── 6. Hard-delete the project ─────────────────────────────────────────
             await _projectRepository.DeleteAsync(request.ProjectId);
 
-            return new DeleteProjectResponse
-            {
-                Message = "Project deleted successfully."
-            };
+            return Response<string>.Ok(null!, "Project deleted successfully.");
         }
     }
 }

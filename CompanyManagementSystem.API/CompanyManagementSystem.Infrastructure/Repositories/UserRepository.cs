@@ -21,71 +21,58 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            // FindByEmailAsync queries on NormalizedEmail (indexed) — case-insensitive and correct.
-            // Raw EF query on Email column would miss records because Identity stores NormalizedEmail.
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user is null) return null;
-
-            await _context.Entry(user)
-                .Collection(u => u.RefreshToken)
-                .LoadAsync();
-
-            return user;
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.NormalizedEmail == email.ToUpperInvariant());
         }
 
         public async Task<User?> GetByIdAsync(Guid id)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
-            if (user is null) return null;
-
-            await _context.Entry(user)
-                .Collection(u => u.RefreshToken)
-                .LoadAsync();
-
-            return user;
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public async Task<User?> GetByUserNameAsync(string userName)
         {
-            // FindByNameAsync queries on NormalizedUserName (indexed).
-            var user = await _userManager.FindByNameAsync(userName);
-            if (user is null) return null;
-
-            await _context.Entry(user)
-                .Collection(u => u.RefreshToken)
-                .LoadAsync();
-
-            return user;
+            return await _context.Users
+                .FirstOrDefaultAsync(u => u.NormalizedUserName == userName.ToUpperInvariant());
         }
 
         public async Task<Guid> GetUserIdFromUserName(string userName)
         {
-            var user = await _userManager.FindByNameAsync(userName);
-            return user?.Id ?? Guid.Empty;
+            return await _context.Users
+                .Where(u => u.NormalizedUserName == userName.ToUpperInvariant())
+                .Select(u => u.Id)
+                .FirstOrDefaultAsync();
         }
 
         // ── Existence checks ───────────────────────────────────────────────────────
 
         public async Task<bool> ExistsByEmailAsync(string email)
         {
-            return await _userManager.FindByEmailAsync(email) is not null;
+            return await _context.Users
+                .AnyAsync(u => u.NormalizedEmail == email.ToUpperInvariant());
         }
 
         public async Task<bool> ExistsByUserNameAsync(string userName)
         {
-            return await _userManager.FindByNameAsync(userName) is not null;
+            return await _context.Users
+                .AnyAsync(u => u.NormalizedUserName == userName.ToUpperInvariant());
         }
 
         public async Task<bool> IsUserBannedAsync(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            return user?.IsBanned ?? false;
+            return await _context.Users
+                .Where(u => u.NormalizedEmail == email.ToUpperInvariant())
+                .Select(u => u.IsBanned)
+                .FirstOrDefaultAsync();
         }
 
         public async Task<bool> IsUserEmailVerfiedAsync(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            return user?.EmailConfirmed ?? false;
+            return await _context.Users
+                .Where(u => u.NormalizedEmail == email.ToUpperInvariant())
+                .Select(u => u.EmailConfirmed)
+                .FirstOrDefaultAsync();
         }
 
         // ── Write operations ───────────────────────────────────────────────────────

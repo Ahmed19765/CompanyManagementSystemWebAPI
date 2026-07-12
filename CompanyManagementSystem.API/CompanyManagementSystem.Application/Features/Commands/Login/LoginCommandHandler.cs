@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using MediatR;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Application.Interfaces.Services.RegistrationAndLogin;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CompanyManagementSystem.Application.Features.Commands.Login
 {
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
+    public class LoginCommandHandler : IRequestHandler<LoginCommand, Response<LoginResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher _passwordHasher;
@@ -34,27 +35,26 @@ namespace CompanyManagementSystem.Application.Features.Commands.Login
             _jwtSettings = jwtSettings.Value;
         }
 
-        public async Task<LoginResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
+        public async Task<Response<LoginResponse>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
             // 1. Get user by email
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user == null)
             {
-                throw new Exception("Invalid email or password.");
+                throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-            // 2. Verify password
             if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash!))
             {
-                throw new Exception("Invalid email or password.");
+                throw new UnauthorizedAccessException("Invalid email or password.");
             }
 
-            if (await _userRepository.IsUserBannedAsync(request.Email))
+            if (user.IsBanned)
             {
-                throw new Exception("This account is banned!");
+                throw new UnauthorizedAccessException("This account is banned!");
             }
 
-            if (!await _userRepository.IsUserEmailVerfiedAsync(request.Email))
+            if (!user.EmailConfirmed)
             {
                 throw new Exception("Please verfiey your email!");
             }
@@ -67,16 +67,18 @@ namespace CompanyManagementSystem.Application.Features.Commands.Login
             await _refreshTokenRepository.DeleteAllUserRefreshTokens(user.Id);
             await _refreshTokenRepository.CreateRefreshToken(user.Id, refreshTokenString);
 
-            return new LoginResponse
-            {
-                FirstName = user.FirstName ?? string.Empty,
-                LastName = user.LastName ?? string.Empty,
-                Email = user.Email ?? string.Empty,
-                Username = user.UserName ?? string.Empty,
-                AccessToken = accessToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
-                RefreshToken = refreshTokenString
-            };
+            return Response<LoginResponse>.Ok(
+                new LoginResponse
+                {
+                    FirstName = user.FirstName ?? string.Empty,
+                    LastName = user.LastName ?? string.Empty,
+                    Email = user.Email ?? string.Empty,
+                    Username = user.UserName ?? string.Empty,
+                    AccessToken = accessToken,
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.DurationInMinutes),
+                    RefreshToken = refreshTokenString
+                },
+                "Login successful.");
         }
     }
 }

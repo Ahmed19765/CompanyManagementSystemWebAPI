@@ -1,20 +1,21 @@
-﻿using MediatR;
+﻿using CompanyManagementSystem.Application.Common;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace CompanyManagementSystem.Application.Features.Commands.EngineerTaskProgress
 {
-    public class EngineerTaskProgressCommandHandler : IRequestHandler<EngineerTaskProgressCommand, EngineerTaskProgressResponse>
+    public class EngineerTaskProgressCommandHandler : IRequestHandler<EngineerTaskProgressCommand, Response<string>>
     {
         public EngineerTaskProgressCommandHandler() 
         {
 
         }
 
-        public async Task<EngineerTaskProgressResponse> Handle(EngineerTaskProgressCommand Request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(EngineerTaskProgressCommand Request, CancellationToken cancellationToken)
         {
-            return new EngineerTaskProgressResponse() { Message = "Not Implemented Yet!" };
+            return Response<string>.Ok(null!, "Not implemented yet.");
         }
     }
 }

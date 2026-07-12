@@ -1,0 +1,113 @@
+### ─────────────────────────────────────────────────
+### Paste tokens here after login
+### ─────────────────────────────────────────────────
+@baseUrl = https://localhost:7001
+@contentType = application/json
+@customerToken = PASTE_CUSTOMER_ACCESS_TOKEN_HERE
+@ownerToken = PASTE_OWNER_ACCESS_TOKEN_HERE
+@projectId = PASTE_PROJECT_GUID_HERE
+@companyId = PASTE_COMPANY_GUID_HERE
+@teamId = PASTE_TEAM_GUID_HERE
+
+### ─────────────────────────────────────────────────
+### 1. Create Project (Customer)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/project/customer/createProject
+Content-Type: {{contentType}}
+Authorization: Bearer {{customerToken}}
+
+{
+  "projectTitle": "E-Commerce Platform",
+  "projectDescription": "Full-stack e-commerce website with payment integration.",
+  "projectDocumentsUrl": "https://drive.google.com/project-docs",
+  "projectOfferedBudget": 75000.00
+}
+
+### ─────────────────────────────────────────────────
+### 2. Get My Projects (Customer)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/project/customer/my-projects
+Authorization: Bearer {{customerToken}}
+
+### ─────────────────────────────────────────────────
+### 3. Update Project — only within 3 days, no accepted offer (Customer)
+### ─────────────────────────────────────────────────
+PUT {{baseUrl}}/api/project/customer/update-project
+Content-Type: {{contentType}}
+Authorization: Bearer {{customerToken}}
+
+{
+  "projectId": "{{projectId}}",
+  "projectTitle": "E-Commerce Platform v2",
+  "projectDescription": "Updated description with mobile app support.",
+  "projectDocumentsUrl": "https://drive.google.com/project-docs-v2",
+  "projectOfferedBudget": 90000.00
+}
+
+### ─────────────────────────────────────────────────
+### 4. Delete Project — only within 3 days, no accepted offer (Customer)
+### ─────────────────────────────────────────────────
+DELETE {{baseUrl}}/api/project/customer/delete-project
+Content-Type: {{contentType}}
+Authorization: Bearer {{customerToken}}
+
+{
+  "projectId": "{{projectId}}"
+}
+
+### ─────────────────────────────────────────────────
+### 5. Get All Pending Projects (Owner — to browse and make offers)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/project/owner/customers-projects
+Authorization: Bearer {{ownerToken}}
+
+### ─────────────────────────────────────────────────
+### 6. Get Offers on a Project (Customer)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/project/customer/project-offers
+Content-Type: {{contentType}}
+Authorization: Bearer {{customerToken}}
+
+{
+  "projectId": "{{projectId}}"
+}
+
+### ─────────────────────────────────────────────────
+### 7. Accept a Company Offer (Customer)
+### All other offers on this project become Rejected.
+### Project status becomes InProgress.
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/project/customer/accept-offer
+Content-Type: {{contentType}}
+Authorization: Bearer {{customerToken}}
+
+{
+  "projectId": "{{projectId}}",
+  "chosenCompanyId": "{{companyId}}"
+}
+
+### ─────────────────────────────────────────────────
+### 8. Assign Project to a Team (Owner)
+### Company must have an Accepted offer on the project.
+### Team must belong to the same company.
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/project/owner/assign-to-team
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "projectId": "{{projectId}}",
+  "teamId": "{{teamId}}"
+}
+
+### ─────────────────────────────────────────────────
+### 9. Unassign Project from a Team (Owner)
+### ─────────────────────────────────────────────────
+DELETE {{baseUrl}}/api/project/owner/unassign-from-team
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "projectId": "{{projectId}}",
+  "teamId": "{{teamId}}"
+}

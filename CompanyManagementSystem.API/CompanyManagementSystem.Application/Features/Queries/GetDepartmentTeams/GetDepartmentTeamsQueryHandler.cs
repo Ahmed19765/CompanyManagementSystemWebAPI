@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Queries.GetDepartmentTeams
 {
     public class GetDepartmentTeamsQueryHandler
-        : IRequestHandler<GetDepartmentTeamsQuery, GetDepartmentTeamsResponse>
+        : IRequestHandler<GetDepartmentTeamsQuery, Response<GetDepartmentTeamsResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IDepartmentRepository _departmentRepository;
@@ -20,7 +21,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetDepartmentTeam
             _teamRepository = teamRepository;
         }
 
-        public async Task<GetDepartmentTeamsResponse> Handle(
+        public async Task<Response<GetDepartmentTeamsResponse>> Handle(
             GetDepartmentTeamsQuery request,
             CancellationToken cancellationToken)
         {
@@ -50,13 +51,15 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetDepartmentTeam
                 MemberCount     = t.UserTeams.Count
             });
 
-            return new GetDepartmentTeamsResponse
-            {
-                DepartmentId   = request.DepartmentId,
-                DepartmentName = department.DepartmentName ?? string.Empty,
-                DepartmentDescription = department.DepartmentDescription,
-                Teams          = dtos
-            };
+            return Response<GetDepartmentTeamsResponse>.Ok(
+                new GetDepartmentTeamsResponse
+                {
+                    DepartmentId   = request.DepartmentId,
+                    DepartmentName = department.DepartmentName ?? string.Empty,
+                    DepartmentDescription = department.DepartmentDescription,
+                    Teams          = dtos
+                },
+                "Teams retrieved successfully.");
         }
     }
 }

@@ -4,10 +4,10 @@ namespace CompanyManagementSystem.Domain.Entities
     // Shown on the Task detail page
     public class TaskDetails
     {
-        public int TaskDetailsId { get; set; }
+        public Guid TaskDetailsId { get; set; } = Guid.NewGuid();
 
         // Link back to the Task (One-to-One)
-        public int TaskId { get; set; }
+        public Guid TaskId { get; set; }
         public Tasks? Task { get; set; }
 
         public string? Notes { get; set; }             // extra notes written by TeamLead

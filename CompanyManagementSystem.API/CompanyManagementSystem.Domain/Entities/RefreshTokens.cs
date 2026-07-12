@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -6,7 +6,7 @@ namespace CompanyManagementSystem.Domain.Entities
 {
     public class RefreshToken
     {
-        public int RefreshTokenId { get; set; }
+        public Guid RefreshTokenId { get; set; } = Guid.NewGuid();
 
         public string Token { get; set; } = null!;
 

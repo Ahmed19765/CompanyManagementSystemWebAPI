@@ -15,7 +15,7 @@ using System.Security.Claims;
 
 namespace CompanyManagementSystem.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/owner")]
     [ApiController]
     public class CompanyController : ControllerBase
     {
@@ -29,143 +29,93 @@ namespace CompanyManagementSystem.API.Controllers
         // ── Commands ───────────────────────────────────────────────────────────────
 
         [Authorize(Roles = "Owner")]
-        [HttpPost("owner/create-company")]
+        [HttpPost("companies")]
         public async Task<IActionResult> AddCompany([FromBody] AddCompanyCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
         [Authorize(Roles = "Owner")]
-        [HttpPut("owner/company-members/rank-up")]
+        [HttpPut("companies/members/rank-up")]
         public async Task<IActionResult> SetCompanyUserRank([FromBody] SetCompanyUserRankCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
         [Authorize(Roles = "Owner")]
-        [HttpPost("owner/add-members")]
+        [HttpPost("companies/members")]
         public async Task<IActionResult> AddCompanyMember([FromBody] AddCompanyMemberCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>Owner: submit an offer from one of their companies on a pending project.</summary>
         [Authorize(Roles = "Owner")]
-        [HttpPost("owner/add-offer")]
+        [HttpPost("companies/offers")]
         public async Task<IActionResult> AddCompanyOffer([FromBody] AddCompanyOfferCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>Owner: remove a specific member from their company.</summary>
         [Authorize(Roles = "Owner")]
-        [HttpDelete("owner/remove-member")]
+        [HttpDelete("companies/members")]
         public async Task<IActionResult> RemoveCompanyMember([FromBody] RemoveCompanyMemberCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
-        /// <summary>Owner: soft-delete a company — dissolves all teams/members, preserves project history.</summary>
         [Authorize(Roles = "Owner")]
-        [HttpDelete("owner/delete-company")]
+        [HttpDelete("companies")]
         public async Task<IActionResult> DeleteCompany([FromBody] DeleteCompanyCommand command)
         {
-            try
-            {
-                command.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(command));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            command.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(command));
         }
 
         // ── Queries ────────────────────────────────────────────────────────────────
 
-        /// <summary>Owner: get all companies they own.</summary>
         [Authorize(Roles = "Owner")]
-        [HttpGet("owner/my-companies")]
+        [HttpGet("companies")]
         public async Task<IActionResult> GetMyCompanies()
         {
-            try
-            {
-                var query = new GetOwnerCompaniesQuery { OwnerId = GetCurrentUserId() };
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            var query = new GetOwnerCompaniesQuery { OwnerId = GetCurrentUserId() };
+            return Ok(await _mediator.Send(query));
         }
 
-        /// <summary>Owner: get all members of a specific company they own.</summary>
         [Authorize(Roles = "Owner")]
-        [HttpGet("owner/{companyId}/members")]
-        public async Task<IActionResult> GetCompanyMembers(int companyId)
+        [HttpGet("companies/{companyId}/members")]
+        public async Task<IActionResult> GetCompanyMembers(Guid companyId)
         {
-            try
+            var query = new GetCompanyMembersQuery
             {
-                var query = new GetCompanyMembersQuery
-                {
-                    RequestingUserId = GetCurrentUserId(),
-                    CompanyId        = companyId
-                };
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+                RequestingUserId = GetCurrentUserId(),
+                CompanyId        = companyId
+            };
+            return Ok(await _mediator.Send(query));
         }
 
-        /// <summary>Owner: get all departments of a specific company they own.</summary>
         [Authorize(Roles = "Owner")]
-        [HttpGet("owner/{companyId}/departments")]
-        public async Task<IActionResult> GetCompanyDepartments(int companyId)
+        [HttpGet("companies/{companyId}/departments")]
+        public async Task<IActionResult> GetCompanyDepartments(Guid companyId)
         {
-            try
+            var query = new GetCompanyDepartmentsQuery
             {
-                var query = new GetCompanyDepartmentsQuery
-                {
-                    RequestingUserId = GetCurrentUserId(),
-                    CompanyId        = companyId
-                };
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+                RequestingUserId = GetCurrentUserId(),
+                CompanyId        = companyId
+            };
+            return Ok(await _mediator.Send(query));
         }
 
-        /// <summary>
-        /// Owner: get all projects their company has an accepted offer on,
-        /// with progress = Done tasks / Total tasks. Returns 0% if no tasks yet.
-        /// </summary>
         [Authorize(Roles = "Owner")]
-        [HttpGet("owner/accepted-projects")]
+        [HttpGet("companies/accepted-projects")]
         public async Task<IActionResult> GetAcceptedProjects([FromBody] GetCompanyAcceptedProjectsQuery query)
         {
-            try
-            {
-                query.OwnerId = GetCurrentUserId();
-                return Ok(await _mediator.Send(query));
-            }
-            catch (Exception ex) { return BadRequest(new { Message = ex.Message }); }
+            query.OwnerId = GetCurrentUserId();
+            return Ok(await _mediator.Send(query));
         }
 
         // ── Helpers ────────────────────────────────────────────────────────────────

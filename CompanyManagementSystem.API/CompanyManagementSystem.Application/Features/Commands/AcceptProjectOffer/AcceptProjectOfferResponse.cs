@@ -2,7 +2,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.AcceptProjectOff
 {
     public class AcceptProjectOfferResponse
     {
-        public int ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public string ProjectTitle { get; set; } = null!;
         public string AcceptedCompanyName { get; set; } = null!;
         public string Message { get; set; } = null!;

@@ -7,10 +7,10 @@ namespace CompanyManagementSystem.Application.Features.Commands.AcceptProjectOff
         public AcceptProjectOfferCommandValidator()
         {
             RuleFor(x => x.ProjectId)
-                .GreaterThan(0).WithMessage("Project id is required.");
+                .NotEmpty().WithMessage("Project id is required.");
 
             RuleFor(x => x.ChosenCompanyId)
-                .GreaterThan(0).WithMessage("Chosen company id is required.");
+                .NotEmpty().WithMessage("Chosen company id is required.");
         }
     }
 }

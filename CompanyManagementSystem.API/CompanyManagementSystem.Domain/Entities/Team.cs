@@ -2,7 +2,7 @@ namespace CompanyManagementSystem.Domain.Entities
 {
     public class Team
     {
-        public int TeamId { get; set; }
+        public Guid TeamId { get; set; } = Guid.NewGuid();
 
         public string? TeamName { get; set; }
         public string? TeamDescription { get; set; }
@@ -12,7 +12,7 @@ namespace CompanyManagementSystem.Domain.Entities
         public User? Leader { get; set; }
 
         // Department relation — nullable so a team can survive if its department is deleted
-        public int? DepartmentId { get; set; }
+        public Guid? DepartmentId { get; set; }
         public Department? Department { get; set; }
 
         // Team members

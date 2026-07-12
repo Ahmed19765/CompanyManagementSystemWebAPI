@@ -7,7 +7,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyMember
         public AddCompanyMemberCommandValidator()
         {
             RuleFor(x => x.CompanyId)
-                .GreaterThan(0).WithMessage("CompanyId must be a positive integer.");
+                .NotEmpty().WithMessage("Company id is required.");
 
             RuleFor(x => x.UserName)
                 .NotEmpty().WithMessage("UserName is required.");

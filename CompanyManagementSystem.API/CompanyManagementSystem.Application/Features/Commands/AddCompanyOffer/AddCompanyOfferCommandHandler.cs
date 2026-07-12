@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Entities;
 using CompanyManagementSystem.Domain.Enumerations;
@@ -6,7 +7,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyOffer
 {
     public class AddCompanyOfferCommandHandler
-        : IRequestHandler<AddCompanyOfferCommand, AddCompanyOfferResponse>
+        : IRequestHandler<AddCompanyOfferCommand, Response<AddCompanyOfferResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -25,7 +26,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyOffer
             _companyOffersRepository = companyOffersRepository;
         }
 
-        public async Task<AddCompanyOfferResponse> Handle(
+        public async Task<Response<AddCompanyOfferResponse>> Handle(
             AddCompanyOfferCommand request,
             CancellationToken cancellationToken)
         {
@@ -94,7 +95,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyOffer
             await _companyOffersRepository.AddAsync(offer);
             await _companyOffersRepository.SaveChangesAsync();
 
-            return new AddCompanyOfferResponse
+            var response = new AddCompanyOfferResponse
             {
                 CompanyId            = offer.CompanyId,
                 ProjectId            = offer.ProjectId,
@@ -104,6 +105,8 @@ namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyOffer
                 Status               = offer.Status.ToString(),
                 Message              = "Offer submitted successfully. Waiting for customer response."
             };
+
+            return Response<AddCompanyOfferResponse>.Ok(response, "Offer submitted successfully.");
         }
     }
 }

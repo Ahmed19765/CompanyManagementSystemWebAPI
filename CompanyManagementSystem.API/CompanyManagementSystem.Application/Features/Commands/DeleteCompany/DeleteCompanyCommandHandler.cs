@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Commands.DeleteCompany
 {
     public class DeleteCompanyCommandHandler
-        : IRequestHandler<DeleteCompanyCommand, DeleteCompanyResponse>
+        : IRequestHandler<DeleteCompanyCommand, Response<DeleteCompanyResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -30,7 +31,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteCompany
             _departmentRepository  = departmentRepository;
         }
 
-        public async Task<DeleteCompanyResponse> Handle(
+        public async Task<Response<DeleteCompanyResponse>> Handle(
             DeleteCompanyCommand request,
             CancellationToken cancellationToken)
         {
@@ -65,7 +66,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteCompany
             int memberCount = members.Count();
 
             // ── 5. Count active tasks BEFORE nullifying so the number is accurate ─
-            int unassignedCount = await CountActiveTasksAsync(request.CompanyId);
+            int unassignedCount = await _taskRepository.CountActiveTasksForCompanyAsync(request.CompanyId);
 
             // ── 6. Nullify active task assignments across all company teams ────────
             // Active tasks (Todo, InProgress, Pending) → AssignedToId = null
@@ -88,30 +89,14 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteCompany
                   $"{unassignedCount} active task(s) unassigned and need reassignment."
                 : $"Company deleted. {memberCount} member(s) removed.";
 
-            return new DeleteCompanyResponse
+            var response = new DeleteCompanyResponse
             {
                 Message             = message,
                 RemovedMemberCount  = memberCount,
                 UnassignedTaskCount = unassignedCount
             };
-        }
 
-        // Counts active tasks across all teams in the company.
-        // Must be called BEFORE NullifyAllActiveTasksInCompanyAsync.
-        private async Task<int> CountActiveTasksAsync(int companyId)
-        {
-            var activeStates = new[] { TaskState.Todo, TaskState.InProgress, TaskState.Pending };
-            var departments  = await _departmentRepository.GetAllByCompanyIdAsync(companyId);
-            int count = 0;
-
-            foreach (var dept in departments)
-            foreach (var team in dept.Teams)
-            {
-                var tasks = await _taskRepository.GetAllByTeamIdAsync(team.TeamId);
-                count += tasks.Count(t => activeStates.Contains(t.Status));
-            }
-
-            return count;
+            return Response<DeleteCompanyResponse>.Ok(response, "Company deleted successfully.");
         }
     }
 }

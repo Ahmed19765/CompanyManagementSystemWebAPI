@@ -2,8 +2,8 @@ namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyOffer
 {
     public class AddCompanyOfferResponse
     {
-        public int CompanyId { get; set; }
-        public int ProjectId { get; set; }
+        public Guid CompanyId { get; set; }
+        public Guid ProjectId { get; set; }
         public decimal OfferedBudget { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime DeliveryExpectedDate { get; set; }

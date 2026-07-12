@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Commands.RemoveCompanyMember
 {
     public class RemoveCompanyMemberCommandHandler
-        : IRequestHandler<RemoveCompanyMemberCommand, RemoveCompanyMemberResponse>
+        : IRequestHandler<RemoveCompanyMemberCommand, Response<RemoveCompanyMemberResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -27,7 +28,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.RemoveCompanyMem
             _taskRepository       = taskRepository;
         }
 
-        public async Task<RemoveCompanyMemberResponse> Handle(
+        public async Task<Response<RemoveCompanyMemberResponse>> Handle(
             RemoveCompanyMemberCommand request,
             CancellationToken cancellationToken)
         {
@@ -60,9 +61,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.RemoveCompanyMem
                 throw new Exception("You cannot remove yourself as the company owner.");
 
             // ── 4. Count active tasks before nullifying (for the response message) ─
-            var activeTasks = await _taskRepository.GetAllAssignedToUserAsync(request.TargetUserId);
-            var activeStates = new[] { TaskState.Todo, TaskState.InProgress, TaskState.Pending };
-            var unassignedCount = activeTasks.Count(t => activeStates.Contains(t.Status));
+            var unassignedCount = await _taskRepository.CountActiveTasksByUserIdAsync(request.TargetUserId);
 
             // ── 5. Nullify active task assignments ────────────────────────────────
             // Done / Failed tasks keep the user's Id — they are a historical record.
@@ -83,11 +82,13 @@ namespace CompanyManagementSystem.Application.Features.Commands.RemoveCompanyMem
                 ? $"Member removed successfully. {unassignedCount} active task(s) have been unassigned and need reassignment."
                 : "Member removed successfully.";
 
-            return new RemoveCompanyMemberResponse
+            var response = new RemoveCompanyMemberResponse
             {
                 Message             = message,
                 UnassignedTaskCount = unassignedCount
             };
+
+            return Response<RemoveCompanyMemberResponse>.Ok(response, "Member removed successfully.");
         }
     }
 }

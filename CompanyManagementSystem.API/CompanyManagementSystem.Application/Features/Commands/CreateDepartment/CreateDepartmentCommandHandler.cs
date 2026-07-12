@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Entities;
 using CompanyManagementSystem.Domain.Enumerations;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.CreateDepartment
 {
-    public class CreateDepartmentCommandHandler : IRequestHandler<CreateDepartmentCommand, CreateDepartmentResponse>
+    public class CreateDepartmentCommandHandler : IRequestHandler<CreateDepartmentCommand, Response<CreateDepartmentResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -21,7 +22,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateDepartment
             _departmentRepository = departmentRepository;
         }
 
-        public async Task<CreateDepartmentResponse> Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
+        public async Task<Response<CreateDepartmentResponse>> Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
         {
             var owner = await _userRepository.GetByIdAsync(request.OwnerId);
             if (owner is null)
@@ -56,7 +57,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateDepartment
             }
 
             var departmentExists = await _departmentRepository.ExistsByNameInCompanyAsync(
-                request.CompanyName,
+                company.CompanyId,
                 request.DepartmentName);
 
             if (departmentExists)
@@ -64,27 +65,22 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateDepartment
                 throw new Exception("Department already exists in this company.");
             }
 
-            var Cid = await _companyRepository.GetCompanyIdFromNameAsync(request.CompanyName);
-
-            if (Cid is null)
-            {
-                throw new Exception("Company Not Exist!!");
-            }
-
             var department = new Department
             {
-                CompanyId =  Cid.Value,
+                CompanyId = company.CompanyId,
                 DepartmentName = request.DepartmentName
             };
 
             await _departmentRepository.AddAsync(department);
             await _departmentRepository.SaveChangesAsync();
 
-            return new CreateDepartmentResponse
-            {
-                DepartmentId = department.DepartmentId,
-                Message = "Department created successfully."
-            };
+            return Response<CreateDepartmentResponse>.Ok(
+                new CreateDepartmentResponse
+                {
+                    DepartmentId = department.DepartmentId,
+                    Message = "Department created successfully."
+                },
+                "Department created successfully.");
         }
     }
 }

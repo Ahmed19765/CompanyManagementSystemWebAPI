@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Commands.AcceptProjectOffer
 {
     public class AcceptProjectOfferCommandHandler
-        : IRequestHandler<AcceptProjectOfferCommand, AcceptProjectOfferResponse>
+        : IRequestHandler<AcceptProjectOfferCommand, Response<AcceptProjectOfferResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IProjectRepository _projectRepository;
@@ -21,7 +22,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.AcceptProjectOff
             _companyOffersRepository = companyOffersRepository;
         }
 
-        public async Task<AcceptProjectOfferResponse> Handle(
+        public async Task<Response<AcceptProjectOfferResponse>> Handle(
             AcceptProjectOfferCommand request,
             CancellationToken cancellationToken)
         {
@@ -77,18 +78,13 @@ namespace CompanyManagementSystem.Application.Features.Commands.AcceptProjectOff
             project.ProjectStatus = ProjectState.InProgress;
             await _projectRepository.UpdateAsync(project);
 
-            // Load company name for the response
-            var updatedOffer = await _companyOffersRepository.GetByIdAsync(
-                request.ChosenCompanyId,
-                request.ProjectId);
-
-            return new AcceptProjectOfferResponse
+            return Response<AcceptProjectOfferResponse>.Ok(new AcceptProjectOfferResponse
             {
                 ProjectId           = project.ProjectId,
                 ProjectTitle        = project.ProjectTitle ?? string.Empty,
-                AcceptedCompanyName = updatedOffer?.Company?.CompanyName ?? string.Empty,
+                AcceptedCompanyName = chosenOffer.Company?.CompanyName ?? string.Empty,
                 Message             = $"Offer accepted. Your project is now handled by the selected company. All other offers have been rejected."
-            };
+            }, "Offer accepted successfully.");
         }
     }
 }

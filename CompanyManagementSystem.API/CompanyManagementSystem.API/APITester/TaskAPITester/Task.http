@@ -1,0 +1,59 @@
+### ─────────────────────────────────────────────────
+### Paste tokens here after login
+### ─────────────────────────────────────────────────
+@baseUrl = https://localhost:7001
+@contentType = application/json
+@ownerToken = PASTE_OWNER_ACCESS_TOKEN_HERE
+@engineerToken = PASTE_ENGINEER_ACCESS_TOKEN_HERE
+@taskId = PASTE_TASK_GUID_HERE
+
+### ─────────────────────────────────────────────────
+### 1. Create Task (Owner or Engineer Leader)
+### ─────────────────────────────────────────────────
+POST {{baseUrl}}/api/task/createTask
+Content-Type: {{contentType}}
+Authorization: Bearer {{ownerToken}}
+
+{
+  "title": "Build Login API",
+  "description": "Implement JWT-based login endpoint.",
+  "dueDate": "2026-09-01T00:00:00Z",
+  "projectId": "PASTE_PROJECT_GUID_HERE",
+  "teamId": "PASTE_TEAM_GUID_HERE",
+  "assignedToId": "PASTE_ENGINEER_USER_GUID_HERE",
+  "notes": "Follow existing auth patterns.",
+  "attachmentUrl": null,
+  "acceptanceCriteria": "Endpoint returns 200 with valid JWT on correct credentials."
+}
+
+### ─────────────────────────────────────────────────
+### 2. Get My Assigned Tasks (Engineer)
+### ─────────────────────────────────────────────────
+GET {{baseUrl}}/api/task/my-tasks
+Authorization: Bearer {{engineerToken}}
+
+### ─────────────────────────────────────────────────
+### 3. Update Task Status — Member (Engineer with Member rank)
+### Allowed values: Todo, InProgress, Pending
+### ─────────────────────────────────────────────────
+PUT {{baseUrl}}/api/task/update-status
+Content-Type: {{contentType}}
+Authorization: Bearer {{engineerToken}}
+
+{
+  "taskId": "{{taskId}}",
+  "newStatus": "InProgress"
+}
+
+### ─────────────────────────────────────────────────
+### 4. Update Task Status — Leader (Engineer with Leader rank)
+### Allowed values: Todo, InProgress, Pending, Done, Failed
+### ─────────────────────────────────────────────────
+PUT {{baseUrl}}/api/task/update-status
+Content-Type: {{contentType}}
+Authorization: Bearer {{engineerToken}}
+
+{
+  "taskId": "{{taskId}}",
+  "newStatus": "Done"
+}

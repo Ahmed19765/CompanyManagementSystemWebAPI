@@ -1,10 +1,11 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Application.Interfaces.Services.MemoryCache;
 using MediatR;
 
 namespace CompanyManagementSystem.Application.Features.Commands.VerifyEmail
 {
-    public class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand, VerifyEmailResponse>
+    public class VerifyEmailCommandHandler : IRequestHandler<VerifyEmailCommand, Response<string>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IMemoryCache<string> _memoryCache;
@@ -17,7 +18,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.VerifyEmail
             _memoryCache = memoryCache;
         }
 
-        public async Task<VerifyEmailResponse> Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(VerifyEmailCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user is null)
@@ -27,10 +28,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.VerifyEmail
 
             if (user.EmailConfirmed)
             {
-                return new VerifyEmailResponse
-                {
-                    Message = "Email is already verified."
-                };
+                return Response<string>.Ok(null!, "Email is already verified.");
             }
 
             var isOtpValid = _memoryCache.Validate(
@@ -50,10 +48,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.VerifyEmail
 
             _memoryCache.Remove(request.Email, TypeOfValue.EmailVerificationOtp);
 
-            return new VerifyEmailResponse
-            {
-                Message = "Email verified successfully."
-            };
+            return Response<string>.Ok(null!, "Email verified successfully.");
         }
     }
 }

@@ -7,7 +7,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.CreateTeam
         public CreateTeamCommandValidator()
         {
             RuleFor(x => x.DepartmentId)
-                .GreaterThan(0).WithMessage("Department id is required.");
+                .NotEmpty().WithMessage("Department id is required.");
 
             RuleFor(x => x.LeaderUserName)
                 .NotEmpty().WithMessage("At least one leader is required to be added for a team.");

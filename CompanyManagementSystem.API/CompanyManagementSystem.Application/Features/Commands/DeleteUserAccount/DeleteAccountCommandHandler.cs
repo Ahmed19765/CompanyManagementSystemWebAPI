@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Application.Interfaces.Services.MemoryCache;
 using MediatR;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace CompanyManagementSystem.Application.Features.Commands.DeleteUserAccount
 {
-    public class DeleteAccountCommandHandler : IRequestHandler<DeleteAccountCommand, DeleteAccountResponse>
+    public class DeleteAccountCommandHandler : IRequestHandler<DeleteAccountCommand, Response<string>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IMemoryCache<string> _memoryCache;
@@ -20,7 +21,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteUserAccoun
             _memoryCache = memoryCache;
         }
 
-        public async Task<DeleteAccountResponse> Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
+        public async Task<Response<string>> Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepository.GetByIdAsync(request.UserId);
             if (user is null)
@@ -47,10 +48,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.DeleteUserAccoun
 
             _memoryCache.Remove(user.Email!, TypeOfValue.DeleteAccountOtp);
 
-            return new DeleteAccountResponse
-            {
-                Message = "Account deleted successfully."
-            };
+            return Response<string>.Ok(null!, "Account deleted successfully.");
         }
     }
 }

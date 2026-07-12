@@ -1,14 +1,14 @@
-﻿namespace CompanyManagementSystem.Domain.Entities
+namespace CompanyManagementSystem.Domain.Entities
 {
     public class Department
     {
-        public int DepartmentId { get; set; }
+        public Guid DepartmentId { get; set; } = Guid.NewGuid();
         public string? DepartmentName { get; set; }
         public string? DepartmentDescription { get; set; }
 
         // Nullable — a team can be unlinked from its department if the department is deleted,
         // and reassigned to a new one later.
-        public int? CompanyId { get; set; }
+        public Guid? CompanyId { get; set; }
         public Company? Company { get; set; }
 
         public ICollection<Team> Teams { get; set; } = new List<Team>();

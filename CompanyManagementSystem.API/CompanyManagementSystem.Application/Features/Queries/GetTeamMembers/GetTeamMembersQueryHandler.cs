@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Queries.GetTeamMembers
 {
     public class GetTeamMembersQueryHandler
-        : IRequestHandler<GetTeamMembersQuery, GetTeamMembersResponse>
+        : IRequestHandler<GetTeamMembersQuery, Response<GetTeamMembersResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ITeamRepository _teamRepository;
@@ -18,7 +19,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetTeamMembers
             _teamRepository = teamRepository;
         }
 
-        public async Task<GetTeamMembersResponse> Handle(
+        public async Task<Response<GetTeamMembersResponse>> Handle(
             GetTeamMembersQuery request,
             CancellationToken cancellationToken)
         {
@@ -50,12 +51,14 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetTeamMembers
                 JoinedAt  = ut.JoinedAt
             });
 
-            return new GetTeamMembersResponse
-            {
-                TeamId   = team.TeamId,
-                TeamName = team.TeamName ?? string.Empty,
-                Members  = dtos
-            };
+            return Response<GetTeamMembersResponse>.Ok(
+                new GetTeamMembersResponse
+                {
+                    TeamId   = team.TeamId,
+                    TeamName = team.TeamName ?? string.Empty,
+                    Members  = dtos
+                },
+                "Members retrieved successfully.");
         }
     }
 }

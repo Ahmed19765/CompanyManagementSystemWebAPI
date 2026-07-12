@@ -7,7 +7,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.UpdateProject
         public UpdateProjectCommandValidator()
         {
             RuleFor(x => x.ProjectId)
-                .GreaterThan(0).WithMessage("Project id is required.");
+                .NotEmpty().WithMessage("Project id is required.");
 
             RuleFor(x => x.ProjectTitle)
                 .NotEmpty().WithMessage("Project title is required.")

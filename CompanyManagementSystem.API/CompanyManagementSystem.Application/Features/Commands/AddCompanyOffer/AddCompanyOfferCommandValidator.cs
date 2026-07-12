@@ -7,10 +7,10 @@ namespace CompanyManagementSystem.Application.Features.Commands.AddCompanyOffer
         public AddCompanyOfferCommandValidator()
         {
             RuleFor(x => x.CompanyId)
-                .GreaterThan(0).WithMessage("Company id is required.");
+                .NotEmpty().WithMessage("Company id is required.");
 
             RuleFor(x => x.ProjectId)
-                .GreaterThan(0).WithMessage("Project id is required.");
+                .NotEmpty().WithMessage("Project id is required.");
 
             RuleFor(x => x.OfferedBudget)
                 .GreaterThan(0).WithMessage("Offered budget must be greater than zero.");

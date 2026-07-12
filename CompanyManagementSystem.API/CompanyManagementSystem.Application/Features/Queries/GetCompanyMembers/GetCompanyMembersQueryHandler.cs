@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Domain.Enumerations;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 namespace CompanyManagementSystem.Application.Features.Queries.GetCompanyMembers
 {
     public class GetCompanyMembersQueryHandler
-        : IRequestHandler<GetCompanyMembersQuery, GetCompanyMembersResponse>
+        : IRequestHandler<GetCompanyMembersQuery, Response<GetCompanyMembersResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -21,7 +22,7 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetCompanyMembers
             _companyUserRepository = companyUserRepository;
         }
 
-        public async Task<GetCompanyMembersResponse> Handle(
+        public async Task<Response<GetCompanyMembersResponse>> Handle(
             GetCompanyMembersQuery request,
             CancellationToken cancellationToken)
         {
@@ -53,11 +54,13 @@ namespace CompanyManagementSystem.Application.Features.Queries.GetCompanyMembers
                 JoinedAt  = cu.JoinedAt
             });
 
-            return new GetCompanyMembersResponse
+            var response = new GetCompanyMembersResponse
             {
                 CompanyId = request.CompanyId,
                 Members   = dtos
             };
+
+            return Response<GetCompanyMembersResponse>.Ok(response, "Members retrieved successfully.");
         }
     }
 }

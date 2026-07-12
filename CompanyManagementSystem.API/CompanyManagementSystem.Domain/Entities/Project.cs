@@ -4,7 +4,7 @@ namespace CompanyManagementSystem.Domain.Entities
 {
     public class Project
     {
-        public int ProjectId { get; set; }
+        public Guid ProjectId { get; set; } = Guid.NewGuid();
         public string? ProjectTitle { get; set; }
         public string? ProjectDescription { get; set; }
         public string? ProjectDocumentsUrl { get; set; }

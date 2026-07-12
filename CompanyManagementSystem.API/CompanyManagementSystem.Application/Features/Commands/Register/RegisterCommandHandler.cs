@@ -1,3 +1,4 @@
+using CompanyManagementSystem.Application.Common;
 using CompanyManagementSystem.Application.Interfaces.Repositories;
 using CompanyManagementSystem.Application.Interfaces.Services.MemoryCache;
 using CompanyManagementSystem.Application.Interfaces.Services.RegistrationAndLogin;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CompanyManagementSystem.Application.Features.Commands.Register
 {
-    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, RegisterResponse>
+    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Response<RegisterResponse>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICompanyRepository _companyRepository;
@@ -41,7 +42,7 @@ namespace CompanyManagementSystem.Application.Features.Commands.Register
             _logger = logger;
         }
 
-        public async Task<RegisterResponse> Handle(
+        public async Task<Response<RegisterResponse>> Handle(
             RegisterCommand request,
             CancellationToken cancellationToken)
         {
@@ -107,14 +108,16 @@ namespace CompanyManagementSystem.Application.Features.Commands.Register
                     user.Email);
             }
 
-            return new RegisterResponse
-            {
-                UserName = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email!,
-                Message = $"Registration successful. Welcome {user.FirstName} {user.LastName}"
-            };
+            return Response<RegisterResponse>.Ok(
+                new RegisterResponse
+                {
+                    UserName = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Email = user.Email!,
+                    Message = $"Registration successful. Welcome {user.FirstName} {user.LastName}"
+                },
+                "Registration successful. Please verify your email.");
         }
     }
 }

@@ -17,13 +17,13 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
 
         }
 
-        public async Task<CompanyUser?> GetMembershipAsync(int companyId, Guid userId)
+        public async Task<CompanyUser?> GetMembershipAsync(Guid companyId, Guid userId)
         {
             return await _context.CompanyUsers
                 .FirstOrDefaultAsync(cu => cu.CompanyId == companyId && cu.UserId == userId);
         }
 
-        public async Task<bool> IsMemberAsync(int companyId, Guid userId)
+        public async Task<bool> IsMemberAsync(Guid companyId, Guid userId)
         {
             return await _context.CompanyUsers
                 .AnyAsync(cu => cu.CompanyId == companyId && cu.UserId == userId);
@@ -42,29 +42,28 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
 
         public async Task RankUserUpAsLeader(string userName)
         {
-            var userId = await _userRepository.GetUserIdFromUserName(userName);
+            var userCom = await _context.CompanyUsers
+                .Where(cu => cu.User!.NormalizedUserName == userName.ToUpperInvariant())
+                .FirstOrDefaultAsync();
 
-            if (userId == Guid.Empty)
-            {
-                throw new Exception("User not exist!!");
-            }
-            await RankUserUpAsLeader(userId);
-        }
-
-        public async Task RankUserUpAsLeader(Guid userId)
-        {
-
-            var userCom = _context.CompanyUsers.FirstOrDefault(uc => uc.UserId == userId);
-
-            if (userCom == null) 
-            {
-                throw new Exception("User is not belong to this Comapny");
-            }
+            if (userCom is null)
+                throw new Exception("User not found in this company.");
 
             userCom.Rank = Domain.Enumerations.CompanyRank.Leader;
         }
 
-        public async Task<IEnumerable<CompanyUser>> GetAllMembersByCompanyIdAsync(int companyId)
+        public async Task RankUserUpAsLeader(Guid userId)
+        {
+            var userCom = await _context.CompanyUsers
+                .FirstOrDefaultAsync(uc => uc.UserId == userId);
+
+            if (userCom is null)
+                throw new Exception("User is not belong to this Company");
+
+            userCom.Rank = Domain.Enumerations.CompanyRank.Leader;
+        }
+
+        public async Task<IEnumerable<CompanyUser>> GetAllMembersByCompanyIdAsync(Guid companyId)
         {
             return await _context.CompanyUsers
                 .Where(cu => cu.CompanyId == companyId)
@@ -72,14 +71,14 @@ namespace CompanyManagementSystem.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        public async Task RemoveMemberAsync(int companyId, Guid userId)
+        public async Task RemoveMemberAsync(Guid companyId, Guid userId)
         {
             await _context.CompanyUsers
                 .Where(cu => cu.CompanyId == companyId && cu.UserId == userId)
                 .ExecuteDeleteAsync();
         }
 
-        public async Task RemoveAllMembersAsync(int companyId)
+        public async Task RemoveAllMembersAsync(Guid companyId)
         {
             // Bulk-delete every membership row for this company in one DB round-trip
             await _context.CompanyUsers

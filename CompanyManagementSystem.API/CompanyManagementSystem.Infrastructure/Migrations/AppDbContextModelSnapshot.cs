@@ -24,11 +24,9 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.Company", b =>
                 {
-                    b.Property<int>("CompanyId")
+                    b.Property<Guid>("CompanyId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CompanyDescription")
                         .HasMaxLength(500)
@@ -67,11 +65,11 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.CompanyOffers", b =>
                 {
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DeliveryExceptedDate")
                         .HasColumnType("datetime2");
@@ -96,8 +94,8 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.CompanyUser", b =>
                 {
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
@@ -119,14 +117,12 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.Department", b =>
                 {
-                    b.Property<int>("DepartmentId")
+                    b.Property<Guid>("DepartmentId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DepartmentId"));
-
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("DepartmentDescription")
                         .HasMaxLength(500)
@@ -146,11 +142,9 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.Project", b =>
                 {
-                    b.Property<int>("ProjectId")
+                    b.Property<Guid>("ProjectId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CustomerId")
                         .HasColumnType("uniqueidentifier");
@@ -187,11 +181,11 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.ProjectTeam", b =>
                 {
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("TeamId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("AssignedAt")
                         .HasColumnType("datetime2");
@@ -205,11 +199,9 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.RefreshToken", b =>
                 {
-                    b.Property<int>("RefreshTokenId")
+                    b.Property<Guid>("RefreshTokenId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RefreshTokenId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -240,11 +232,9 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.TaskDetails", b =>
                 {
-                    b.Property<int>("TaskDetailsId")
+                    b.Property<Guid>("TaskDetailsId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskDetailsId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AcceptanceCriteria")
                         .HasMaxLength(2000)
@@ -258,8 +248,8 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<int>("TaskId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TaskId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("TaskDetailsId");
 
@@ -271,11 +261,9 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.Tasks", b =>
                 {
-                    b.Property<int>("TaskId")
+                    b.Property<Guid>("TaskId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskId"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("AssignedById")
                         .HasColumnType("uniqueidentifier");
@@ -289,8 +277,8 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("ProjectId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -306,8 +294,8 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("TeamId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("TeamId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("TaskId");
 
@@ -324,14 +312,12 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
 
             modelBuilder.Entity("CompanyManagementSystem.Domain.Entities.Team", b =>
                 {
-                    b.Property<int>("TeamId")
+                    b.Property<Guid>("TeamId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TeamId"));
-
-                    b.Property<int?>("DepartmentId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("DepartmentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("LeaderId")
                         .HasColumnType("uniqueidentifier");
@@ -444,8 +430,8 @@ namespace CompanyManagementSystem.Infrastructure.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("TeamId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("JoinedAt")
                         .HasColumnType("datetime2");

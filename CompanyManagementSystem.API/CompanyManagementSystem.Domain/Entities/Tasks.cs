@@ -4,7 +4,7 @@ namespace CompanyManagementSystem.Domain.Entities
 {
     public class Tasks
     {
-        public int TaskId { get; set; }
+        public Guid TaskId { get; set; } = Guid.NewGuid();
         public string? TaskTitle { get; set; }
         public string? TaskDescription { get; set; }
 
@@ -15,11 +15,11 @@ namespace CompanyManagementSystem.Domain.Entities
         public DateTime? DueDate { get; set; }  // deadline for this task
 
         // Project this task belongs to
-        public int ProjectId { get; set; }
+        public Guid ProjectId { get; set; }
         public Project? Project { get; set; }
 
         // Team this task belongs to — nullable so task can survive if team is deleted
-        public int? TeamId { get; set; }
+        public Guid? TeamId { get; set; }
         public Team? Team { get; set; }
 
         // Who CREATED / ASSIGNED this task (TeamLead or Owner)
